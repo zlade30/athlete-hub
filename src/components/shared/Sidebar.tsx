@@ -5,6 +5,8 @@ import { twMerge } from 'tailwind-merge';
 import { Button } from './buttons';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/firebase';
+import Image from 'next/image';
+import { logoImg } from '@/public/images';
 
 type NavItemProps = {
     value: string;
@@ -57,7 +59,9 @@ const Sidebar = () => {
 
     return (
         <nav className="w-[300px] h-full bg-white flex flex-col border border-r-gray-200">
-            <section className="w-full h-[200px]" />
+            <section className="w-full bg-white h-[200px] relative">
+                <Image fill src={logoImg} alt="logo" className="object-contain p-2" />
+            </section>
             <section className="w-full flex flex-col text-[14px]">
                 <NavItem active={isCurrentPage('/players')} value="Players" handleNavigate={handleNavigate} />
                 <NavItem active={isCurrentPage('/coaches')} value="Coaches" handleNavigate={handleNavigate} />

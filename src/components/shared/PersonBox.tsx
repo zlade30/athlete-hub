@@ -26,7 +26,12 @@ const PersonBox = ({ player }: { player: PlayerProps }) => {
             )}
         >
             <div className="w-[80px] h-[80px] rounded-[80px] relative mb-[10px]">
-                <Image className="rounded-[80px]" src={player.profile || defaultProfileImg} fill alt="profile" />
+                <Image
+                    className="rounded-[80px] object-cover"
+                    src={player.profile || defaultProfileImg}
+                    fill
+                    alt="profile"
+                />
             </div>
             <div className="text-center mt-[10px]">
                 <p className="font-medium">{player.firstName}</p>
