@@ -2,13 +2,11 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 type InitialStateProps = {
     players: PlayerProps[];
-    showPlayerModal: boolean;
     selectedPlayer: PlayerProps | undefined;
 };
 
 const initialState: InitialStateProps = {
     players: [],
-    showPlayerModal: false,
     selectedPlayer: undefined,
 };
 
@@ -28,9 +26,6 @@ export const slice = createSlice({
         updatePlayer: (state, action: PayloadAction<PlayerProps>) => {
             state.players = state.players.map((item) => item.id === action.payload.id ? { ...action.payload } : item)
         },
-        setShowPlayerModal: (state, action: PayloadAction<boolean>) => {
-            state.showPlayerModal = action.payload
-        },
         setSelectedPlayer: (state, action: PayloadAction<PlayerProps | undefined>) => {
             state.selectedPlayer = action.payload
         }
@@ -43,7 +38,6 @@ export const {
     createPlayer,
     removePlayer,
     setSelectedPlayer,
-    setShowPlayerModal
 } = slice.actions;
 
 export default slice.reducer;

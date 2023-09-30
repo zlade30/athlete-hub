@@ -7,6 +7,8 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/firebase';
 import Image from 'next/image';
 import { logoImg } from '@/public/images';
+import { useDispatch } from 'react-redux';
+import { setCurrentInfo } from '@/redux/reducers/app';
 
 type NavItemProps = {
     value: string;
@@ -40,10 +42,12 @@ const NavItem = ({ value, active, handleNavigate }: NavItemProps) => (
 );
 
 const Sidebar = () => {
+    const dispatch = useDispatch();
     const router = useRouter();
     const path = usePathname();
 
     const handleNavigate = (route: string) => {
+        dispatch(setCurrentInfo('barangay-info'));
         router.push(`/${route.toLocaleLowerCase()}`);
     };
 

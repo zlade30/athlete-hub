@@ -4,10 +4,8 @@ import { PersonBox } from '@/components/shared';
 import { useAppSelector } from '@/redux/store';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setPlayers } from '@/redux/reducers/players';
 import { ExportIcon, PrintIcon, UserIcon } from '@/public/icons';
 import { setShowSpinnerFallback } from '@/redux/reducers/app';
-import { fbGetPlayers } from '@/firebase-api/player';
 import { Input } from '@/components/shared/textfields';
 import { FallbackEmpty, FallbackSpinner } from '@/components/shared/fallbacks';
 import { Select } from '@/components/shared/options';
@@ -15,36 +13,38 @@ import { getSports } from '@/firebase-api/utils';
 import { SpinnerDialog } from '@/components/shared/dialogs';
 import Papa from 'papaparse';
 import ReactToPrint from 'react-to-print';
-import { PlayersReport } from '.';
+import { fbGetCoaches } from '@/firebase-api/coaches';
+import { setCoaches } from '@/redux/reducers/coaches';
+import { CoachesReport } from '.';
 
-const PlayersList = () => {
-    const playersReportRef = useRef();
+const CoachList = () => {
+    const coachesReportRef = useRef();
     const dispatch = useDispatch();
     const { showSpinnerFallback } = useAppSelector((state) => state.app);
-    const { players } = useAppSelector((state) => state.player);
+    const { coaches } = useAppSelector((state) => state.coaches);
     const { selectedBarangay } = useAppSelector((state) => state.barangay);
-    const [playerList, setPlayerList] = useState<PlayerProps[]>([]);
+    const [coachList, setCoachList] = useState<CoachProps[]>([]);
     const [sportList, setSportList] = useState<SportsProps[]>([]);
-    const [searchPlayer, setSearchPlayer] = useState('');
+    const [searchCoach, setSearchCoach] = useState('');
     const [selectedSport, setSelectedSport] = useState('All');
     const [isGuest, setIsGuest] = useState(false);
 
-    const handleKeyFilters = (list: PlayerProps[], key: 'barangay' | 'sport', selectedKey: string) => {
+    const handleKeyFilters = (list: CoachProps[], key: 'barangay' | 'sport', selectedKey: string) => {
         if (selectedKey === 'All') {
-            return list.filter((item: PlayerProps) => item[key] !== 'All');
+            return list.filter((item: CoachProps) => item[key] !== 'All');
         } else {
-            return list.filter((item: PlayerProps) => item[key] === selectedKey);
+            return list.filter((item: CoachProps) => item[key] === selectedKey);
         }
     };
 
-    const handleFilters = (list: PlayerProps[]) => {
+    const handleFilters = (list: CoachProps[]) => {
         const barangayFilter = handleKeyFilters(list, 'barangay', selectedBarangay);
         const filter = handleKeyFilters(barangayFilter, 'sport', selectedSport);
         return filter;
     };
 
     const handleExport = () => {
-        const refactorList = playerList.map((item) => ({
+        const refactorList = coachList.map((item) => ({
             'LAST NAME': item.lastName,
             'FIRST NAME': item.firstName,
             AGE: item.age,
@@ -60,12 +60,12 @@ const PlayersList = () => {
         link.click();
     };
 
-    const loadPlayers = async () => {
+    const loadCoaches = async () => {
         try {
-            dispatch(setShowSpinnerFallback({ show: true, content: 'Fetching players...' }));
-            const result = await fbGetPlayers();
+            dispatch(setShowSpinnerFallback({ show: true, content: 'Fetching coaches...' }));
+            const result = await fbGetCoaches();
             const list = handleFilters(result);
-            dispatch(setPlayers(list!));
+            dispatch(setCoaches(list!));
             dispatch(setShowSpinnerFallback({ show: false, content: '' }));
         } catch (error) {
             console.log(error);
@@ -82,27 +82,27 @@ const PlayersList = () => {
 
     const handleSearch = (evt: ChangeEvent<HTMLInputElement>) => {
         const value = evt.target.value;
-        const result = players.filter((item) =>
+        const result = coaches.filter((item) =>
             `${item.firstName} ${item.lastName}`.toLocaleLowerCase().includes(value.toLocaleLowerCase())
         );
         const list = handleFilters(result);
-        setPlayerList(list);
-        setSearchPlayer(evt.target.value);
+        setCoachList(list);
+        setSearchCoach(evt.target.value);
     };
 
     const handleSelectedItem = (item: SportsProps) => {
         setSelectedSport(item.value);
-        setSearchPlayer('');
+        setSearchCoach('');
     };
 
     useEffect(() => {
-        loadPlayers();
+        loadCoaches();
     }, [selectedBarangay, selectedSport]);
 
     useEffect(() => {
-        const list = handleFilters(players);
-        setPlayerList(list!);
-    }, [players]);
+        const list = handleFilters(coaches);
+        setCoachList(list!);
+    }, [coaches]);
 
     useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
@@ -112,9 +112,9 @@ const PlayersList = () => {
     return (
         <div className="w-full h-full flex flex-col overflow-y-auto relative">
             <SpinnerDialog />
-            <PlayersReport
-                ref={playersReportRef}
-                playerList={playerList}
+            <CoachesReport
+                ref={coachesReportRef}
+                coachList={coachList}
                 selectedSport={selectedSport}
                 selectedBarangay={selectedBarangay}
             />
@@ -129,10 +129,10 @@ const PlayersList = () => {
                     />
                     <Input
                         containerClassName="w-[300px] flex flex-col gap-[4px]"
-                        label="Search Player"
+                        label="Search Coach"
                         type="text"
                         className="normal-case"
-                        value={searchPlayer}
+                        value={searchCoach}
                         onChange={handleSearch}
                     />
                 </div>
@@ -141,19 +141,19 @@ const PlayersList = () => {
                         <ExportIcon onClick={handleExport} className="w-[30px] h-[30px] cursor-pointer" />
                         <ReactToPrint
                             trigger={() => <PrintIcon className="w-[30px] h-[30px] cursor-pointer" />}
-                            content={() => playersReportRef.current!}
+                            content={() => coachesReportRef.current!}
                         />
                     </div>
                 )}
             </div>
-            {showSpinnerFallback.show && <FallbackSpinner content="Fetching players..." />}
-            {playerList.length === 0 && !showSpinnerFallback.show && (
+            {showSpinnerFallback.show && <FallbackSpinner content="Fetching coaches..." />}
+            {coachList.length === 0 && !showSpinnerFallback.show && (
                 <FallbackEmpty icon={<UserIcon className="w-[50px] h-[50px]" />} content="List is currently empty." />
             )}
             {!showSpinnerFallback.show && (
                 <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto">
-                    {playerList.map((player) => (
-                        <PersonBox key={player.id} person={player} />
+                    {coachList.map((person) => (
+                        <PersonBox key={person.id} person={person} />
                     ))}
                 </div>
             )}
@@ -161,4 +161,4 @@ const PlayersList = () => {
     );
 };
 
-export default PlayersList;
+export default CoachList;

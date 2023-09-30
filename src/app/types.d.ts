@@ -12,7 +12,7 @@ declare global {
         password: string;
     }
 
-    type InfoProps = 'player-info' | 'barangay-info'
+    type InfoProps = 'player-info' | 'barangay-info' | 'coach-info'
 
     type FallbackProps = {
         show: boolean;
@@ -29,6 +29,20 @@ declare global {
     type SpinnerDialogProps = {
         open: boolean;
         content: string;
+    }
+
+    type CoachProps = {
+        id?: string;
+        profile: string;
+        lastName: string;
+        firstName: string;
+        suffix: string;
+        sport: string;
+        barangay: string;
+        gender: string;
+        age: string;
+        dateAdded?: number;
+        dateUpdated?: number;
     }
 
     type PlayerProps = {

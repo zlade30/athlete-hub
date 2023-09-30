@@ -4,12 +4,15 @@ import { Select } from '@/components/shared/options';
 import { getBarangay } from '@/firebase-api/utils';
 import { setBarangayList, setSelectedBarangay } from '@/redux/reducers/barangay';
 import { useAppSelector } from '@/redux/store';
+import { usePathname } from 'next/navigation';
 
 const BarangayInformation = () => {
     const dispatch = useDispatch();
+    const path = usePathname();
     const { players } = useAppSelector((state) => state.player);
+    const { coaches } = useAppSelector((state) => state.coaches);
     const { selectedBarangay, barangayList } = useAppSelector((state) => state.barangay);
-    const [availablePlayers, setAvailablePlayers] = useState<PlayerProps[]>([]);
+    const [people, setPeople] = useState<any[]>([]);
 
     const loadBarangay = async () => {
         try {
@@ -23,37 +26,42 @@ const BarangayInformation = () => {
     };
 
     const maleCount = useMemo(() => {
-        return availablePlayers.filter((item) => item.gender === 'Male').length;
-    }, [availablePlayers]);
+        return people.filter((item) => item.gender === 'Male').length;
+    }, [people]);
 
     const femaleCount = useMemo(() => {
-        return availablePlayers.filter((item) => item.gender === 'Female').length;
-    }, [availablePlayers]);
+        return people.filter((item) => item.gender === 'Female').length;
+    }, [people]);
 
     const playerCount = useMemo(() => {
-        return availablePlayers.length;
-    }, [availablePlayers]);
+        return people.length;
+    }, [people]);
 
     const sportCount = useMemo(() => {
-        const uniqueList = Array.from(new Set(availablePlayers.map((obj) => obj.sport))).map((sport) => {
-            return availablePlayers.find((obj) => obj.sport === sport);
+        const uniqueList = Array.from(new Set(people.map((obj) => obj.sport))).map((sport) => {
+            return people.find((obj) => obj.sport === sport);
         });
         return uniqueList.length;
-    }, [availablePlayers]);
+    }, [people]);
+
+    const handleList = (data: any[]) => {
+        if (selectedBarangay === 'All') {
+            const list = data.filter((item) => item.barangay !== 'All');
+            setPeople(list);
+        } else {
+            const list = data.filter((item) => item.barangay === selectedBarangay);
+            setPeople(list);
+        }
+    };
 
     useEffect(() => {
         loadBarangay();
     }, []);
 
     useEffect(() => {
-        if (selectedBarangay === 'All') {
-            const list = players.filter((item) => item.barangay !== 'All');
-            setAvailablePlayers(list);
-        } else {
-            const list = players.filter((item) => item.barangay === selectedBarangay);
-            setAvailablePlayers(list);
-        }
-    }, [players, selectedBarangay]);
+        if (selectedBarangay && path === '/players') handleList(players);
+        else if (selectedBarangay && path === '/coaches') handleList(coaches);
+    }, [players, coaches, selectedBarangay]);
 
     return (
         <>

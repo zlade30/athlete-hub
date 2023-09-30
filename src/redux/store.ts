@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
-import { appReducer, barangayReducer, playerReducer } from './reducers';
+import { appReducer, barangayReducer, coachesReducer, playerReducer } from './reducers';
 
 export const store = configureStore({
     reducer: {
         app: appReducer,
         player: playerReducer,
+        coaches: coachesReducer,
         barangay: barangayReducer
     }
 });

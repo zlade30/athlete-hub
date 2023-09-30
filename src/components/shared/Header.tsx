@@ -15,9 +15,16 @@ const Header = () => {
     const { selectedBarangay } = useAppSelector((state) => state.barangay);
     const [isGuest, setIsGuest] = useState(false);
 
-    const handleNewPlayer = () => {
+    const handleClick = () => {
         dispatch(setSelectedPlayer(undefined));
-        dispatch(setCurrentInfo('player-info'));
+        if (path === 'players') dispatch(setCurrentInfo('player-info'));
+        else if (path === 'coaches') dispatch(setCurrentInfo('coach-info'));
+    };
+
+    const handleBtnText = () => {
+        if (path === 'players') return 'New Player';
+        else if (path === 'coaches') return 'New Coach';
+        return '';
     };
 
     useEffect(() => {
@@ -32,7 +39,7 @@ const Header = () => {
                     {selectedBarangay !== 'All' && <div className="w-[2px] h-[30px] bg-gray-400" />}
                     <p className="text-[24px] font-bold">{selectedBarangay === 'All' ? '' : selectedBarangay}</p>
                 </div>
-                {!isGuest && <Button onClick={handleNewPlayer} value="New Player" className="w-[150px]" />}
+                {!isGuest && <Button onClick={handleClick} value={handleBtnText()} className="w-[150px]" />}
             </div>
         </header>
     );

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { defaultProfileImg } from '@/public/images';
 import { useEffect, useState } from 'react';
 import { User } from 'firebase/auth';
+import { CoachInformation } from '../features/coaches';
 
 const Information = () => {
     const { currentInfo } = useAppSelector((state) => state.app);
@@ -15,6 +16,7 @@ const Information = () => {
     const renderInformation = () => {
         if (currentInfo === 'barangay-info') return <BarangayInformation />;
         else if (currentInfo === 'player-info') return <PlayerInformation />;
+        else if (currentInfo === 'coach-info') return <CoachInformation />;
     };
 
     useEffect(() => {

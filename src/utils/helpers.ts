@@ -22,3 +22,20 @@ export const genderData = () => {
 export const defaultOptionData = () => {
     return [{ id: generateId(10), value: '' }]
 }
+
+export const printDate = () => {
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1;
+    const day = currentDate.getDate();
+    const year = currentDate.getFullYear();
+    const hours = currentDate.getHours();
+    const minutes = currentDate.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+    const formattedMonth = String(month).padStart(2, "0");
+    const formattedDay = String(day).padStart(2, "0");
+    const formattedHoursStr = String(formattedHours).padStart(2, "0");
+    const formattedMinutesStr = String(minutes).padStart(2, "0");
+    const formattedDateString = `${formattedMonth}/${formattedDay}/${year} ${formattedHoursStr}:${formattedMinutesStr} ${ampm}`;
+    return formattedDateString;
+}
