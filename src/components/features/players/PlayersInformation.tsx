@@ -7,24 +7,24 @@ import { defaultProfileImg } from '@/public/images';
 import { defaultOptionData, genderData, suffixData } from '@/utils/helpers';
 import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
+import { createPlayer, removePlayer, setSelectedPlayer, updatePlayer } from '@/redux/reducers/players';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { getBarangay, getSports } from '@/firebase-api/utils';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '@/firebase';
 import { setCurrentInfo, setShowSpinnerDialog } from '@/redux/reducers/app';
+import { fbAddPlayer, fbDeletePlayer, fbUpdatePlayer } from '@/firebase-api/player';
 import { Input } from '@/components/shared/textfields';
 import { Select } from '@/components/shared/options';
 import { Button } from '@/components/shared/buttons';
-import { fbAddCoach, fbDeleteCoach, fbUpdateCoach } from '@/firebase-api/coaches';
-import { createCoach, removeCoach, setSelectedCoach, updateCoach } from '@/redux/reducers/coaches';
 
-const CoachInformation = () => {
+const PlayersInformation = () => {
     const dispatch = useDispatch();
-    const { selectedCoach } = useAppSelector((state) => state.coaches);
+    const { selectedPlayer } = useAppSelector((state) => state.player);
     const [barangay, setBarangay] = useState<SelectPropsData[]>();
     const [sports, setSports] = useState<SelectPropsData[]>();
     const [selectedPhoto, setSelectedPhoto] = useState<File>();
-    const isUpdate = selectedCoach?.id;
+    const isUpdate = selectedPlayer?.id;
     const isGuest = localStorage.getItem('id') === 'guest';
 
     const schema = yup.object().shape({
@@ -35,7 +35,11 @@ const CoachInformation = () => {
         gender: yup.string().required('* required field'),
         sport: yup.string().required('* required field'),
         barangay: yup.string().required('* required field'),
-        age: yup.string().required('* required field')
+        height: yup.string().notRequired(),
+        age: yup.string().required('* required field'),
+        weight: yup.string().notRequired(),
+        achievements: yup.array().notRequired(),
+        videos: yup.array().notRequired()
     });
 
     const formik = useFormik({
@@ -46,18 +50,22 @@ const CoachInformation = () => {
             suffix: '',
             barangay: '',
             sport: '',
+            height: '',
             gender: '',
             age: '',
+            weight: '',
+            achivements: [],
+            videos: [],
             dateAdded: 0,
             dateUpdated: 0
         },
         validationSchema: schema,
-        onSubmit: async (values: CoachProps) => {
+        onSubmit: async (values: PlayerProps) => {
             try {
                 dispatch(
                     setShowSpinnerDialog({
                         open: true,
-                        content: isUpdate ? 'Updating a coach...' : 'Adding a coach...'
+                        content: isUpdate ? 'Updating a player...' : 'Adding a player...'
                     })
                 );
                 let result;
@@ -65,30 +73,30 @@ const CoachInformation = () => {
                 let lastName = values.lastName.charAt(0).toUpperCase() + values.lastName.slice(1);
                 let firstName = values.firstName.charAt(0).toUpperCase() + values.firstName.slice(1);
                 if (selectedPhoto) {
-                    const storageRef = ref(storage, `/coaches/${values.firstName} ${values.lastName}/profile.png`);
+                    const storageRef = ref(storage, `/players/${values.firstName} ${values.lastName}/profile.png`);
                     const uploadTask = await uploadBytes(storageRef, selectedPhoto, {
                         contentType: 'image/png'
                     });
                     profile = await getDownloadURL(uploadTask.ref);
                 }
                 if (isUpdate) {
-                    result = await fbUpdateCoach({
+                    result = await fbUpdatePlayer({
                         ...values,
                         profile: profile || values.profile,
                         dateUpdated: new Date().getTime(),
                         lastName,
                         firstName
                     });
-                    dispatch(updateCoach(result!));
+                    dispatch(updatePlayer(result!));
                 } else {
-                    result = await fbAddCoach({
+                    result = await fbAddPlayer({
                         ...values,
                         profile,
                         dateAdded: new Date().getTime(),
                         lastName,
                         firstName
                     });
-                    dispatch(createCoach(result!));
+                    dispatch(createPlayer(result!));
                     dispatch(setCurrentInfo('barangay-info'));
                 }
                 setSelectedPhoto(undefined);
@@ -103,7 +111,7 @@ const CoachInformation = () => {
 
     const handleClose = () => {
         dispatch(setCurrentInfo('barangay-info'));
-        dispatch(setSelectedCoach(undefined));
+        dispatch(setSelectedPlayer(undefined));
     };
 
     const loadData = async () => {
@@ -117,9 +125,9 @@ const CoachInformation = () => {
 
     const handleDelete = async () => {
         try {
-            dispatch(setShowSpinnerDialog({ open: true, content: 'Removing coach...' }));
-            await fbDeleteCoach(selectedCoach?.id!);
-            dispatch(removeCoach(selectedCoach?.id!));
+            dispatch(setShowSpinnerDialog({ open: true, content: 'Removing player...' }));
+            await fbDeletePlayer(selectedPlayer?.id!);
+            dispatch(removePlayer(selectedPlayer?.id!));
             dispatch(setShowSpinnerDialog({ open: false, content: '' }));
             dispatch(setCurrentInfo('barangay-info'));
         } catch (error) {
@@ -134,18 +142,17 @@ const CoachInformation = () => {
 
     useEffect(() => {
         if (isUpdate) {
-            formik.setValues(selectedCoach);
+            formik.setValues(selectedPlayer);
         } else {
             formik.resetForm();
         }
-        console.log(selectedCoach);
         setSelectedPhoto(undefined);
-    }, [selectedCoach]);
+    }, [selectedPlayer]);
 
     return (
         <>
             <header className="flex items-center justify-between p-[20px]">
-                <p className="text-[18px] font-bold">{isUpdate ? 'Update Coach' : 'Add Coach'}</p>
+                <p className="text-[18px] font-bold">{isUpdate ? 'Update Player' : 'Add Player'}</p>
                 <Button
                     className="w-[100px] bg-transparent text-primary font-medium hover:bg-secondary"
                     value="Close"
@@ -263,10 +270,50 @@ const CoachInformation = () => {
                     label="Age"
                     id="age"
                     name="age"
-                    type="number"
+                    type="text"
                     value={formik.values.age}
-                    onChange={formik.handleChange}
+                    onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+                        const value = evt.target.value;
+                        const numericValue = value.replace(/[^0-9.]/g, '');
+                        formik.setFieldValue('age', numericValue);
+                    }}
                     error={formik.errors.age}
+                    pattern="[0-9]"
+                />
+                <Input
+                    disabled={isGuest}
+                    containerClassName="col-span-2 flex flex-col gap-[4px]"
+                    label="Height"
+                    id="height"
+                    name="height"
+                    type="text"
+                    placeholder="cm"
+                    className="normal-case"
+                    value={formik.values.height}
+                    onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+                        const value = evt.target.value;
+                        const numericValue = value.replace(/[^0-9.]/g, '');
+                        formik.setFieldValue('height', numericValue);
+                    }}
+                    error={formik.errors.height}
+                    pattern="[0-9]"
+                />
+                <Input
+                    disabled={isGuest}
+                    containerClassName="col-span-2 flex flex-col gap-[4px]"
+                    label="Weight"
+                    id="weight"
+                    name="weight"
+                    type="text"
+                    placeholder="kg"
+                    className="normal-case"
+                    value={formik.values.weight}
+                    onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+                        const value = evt.target.value;
+                        const numericValue = value.replace(/[^0-9.]/g, '');
+                        formik.setFieldValue('weight', numericValue);
+                    }}
+                    error={formik.errors.weight}
                     pattern="[0-9]"
                 />
                 {!isGuest && (
@@ -287,4 +334,4 @@ const CoachInformation = () => {
     );
 };
 
-export default CoachInformation;
+export default PlayersInformation;

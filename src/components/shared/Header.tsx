@@ -7,6 +7,9 @@ import { setSelectedPlayer } from '@/redux/reducers/players';
 import { setCurrentInfo } from '@/redux/reducers/app';
 import { useAppSelector } from '@/redux/store';
 import { useEffect, useState } from 'react';
+import { setSelectedCoach } from '@/redux/reducers/coaches';
+import { setSelectedPlayers, setSelectedTeam } from '@/redux/reducers/teams';
+import { setSelectedSport } from '@/redux/reducers/sports';
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -16,14 +19,27 @@ const Header = () => {
     const [isGuest, setIsGuest] = useState(false);
 
     const handleClick = () => {
-        dispatch(setSelectedPlayer(undefined));
-        if (path === 'players') dispatch(setCurrentInfo('player-info'));
-        else if (path === 'coaches') dispatch(setCurrentInfo('coach-info'));
+        if (path === 'players') {
+            dispatch(setCurrentInfo('player-info'));
+            dispatch(setSelectedPlayer(undefined));
+        } else if (path === 'coaches') {
+            dispatch(setCurrentInfo('coach-info'));
+            dispatch(setSelectedCoach(undefined));
+        } else if (path === 'teams') {
+            dispatch(setCurrentInfo('team-info'));
+            dispatch(setSelectedTeam(undefined));
+            dispatch(setSelectedPlayers([]));
+        } else if (path === 'sports') {
+            dispatch(setCurrentInfo('sport-info'));
+            dispatch(setSelectedSport(undefined));
+        }
     };
 
     const handleBtnText = () => {
         if (path === 'players') return 'New Player';
         else if (path === 'coaches') return 'New Coach';
+        else if (path === 'teams') return 'New Team';
+        else if (path === 'sports') return 'New Sport';
         return '';
     };
 

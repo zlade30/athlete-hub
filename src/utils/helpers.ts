@@ -39,3 +39,13 @@ export const printDate = () => {
     const formattedDateString = `${formattedMonth}/${formattedDay}/${year} ${formattedHoursStr}:${formattedMinutesStr} ${ampm}`;
     return formattedDateString;
 }
+
+export const debounce = (func: Function, delay: number) => {
+    let timer: any;
+    return (...args: any[]) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+};

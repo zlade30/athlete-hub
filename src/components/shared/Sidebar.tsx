@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { logoImg } from '@/public/images';
 import { useDispatch } from 'react-redux';
 import { setCurrentInfo } from '@/redux/reducers/app';
+import { setSelectedBarangay } from '@/redux/reducers/barangay';
 
 type NavItemProps = {
     value: string;
@@ -47,6 +48,7 @@ const Sidebar = () => {
     const path = usePathname();
 
     const handleNavigate = (route: string) => {
+        dispatch(setSelectedBarangay('All'));
         dispatch(setCurrentInfo('barangay-info'));
         router.push(`/${route.toLocaleLowerCase()}`);
     };

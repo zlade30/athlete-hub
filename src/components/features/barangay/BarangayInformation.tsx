@@ -37,6 +37,10 @@ const BarangayInformation = () => {
         return people.length;
     }, [people]);
 
+    const coachCount = useMemo(() => {
+        return people.length;
+    }, [people]);
+
     const sportCount = useMemo(() => {
         const uniqueList = Array.from(new Set(people.map((obj) => obj.sport))).map((sport) => {
             return people.find((obj) => obj.sport === sport);
@@ -89,13 +93,24 @@ const BarangayInformation = () => {
                         <p className="text-[40px] font-bold text-pink-500">{femaleCount}</p>
                     </div>
                 </div>
-                <div className="flex flex-col justify-center items-start bg-secondary h-[150px] p-[20px] rounded-[8px]">
-                    <p className="uppercase text-[12px]">Players</p>
-                    <div className="flex items-center">
-                        <div />
-                        <p className="text-[40px] font-bold text-primary">{playerCount}</p>
+                {path === '/players' && (
+                    <div className="flex flex-col justify-center items-start bg-secondary h-[150px] p-[20px] rounded-[8px]">
+                        <p className="uppercase text-[12px]">Players</p>
+                        <div className="flex items-center">
+                            <div />
+                            <p className="text-[40px] font-bold text-primary">{playerCount}</p>
+                        </div>
                     </div>
-                </div>
+                )}
+                {path === '/coaches' && (
+                    <div className="flex flex-col justify-center items-start bg-secondary h-[150px] p-[20px] rounded-[8px]">
+                        <p className="uppercase text-[12px]">Coaches</p>
+                        <div className="flex items-center">
+                            <div />
+                            <p className="text-[40px] font-bold text-primary">{coachCount}</p>
+                        </div>
+                    </div>
+                )}
                 <div className="flex flex-col justify-center items-start bg-secondary h-[150px] p-[20px] rounded-[8px]">
                     <p className="uppercase text-[12px]">Sports</p>
                     <div className="flex items-center">

@@ -12,7 +12,7 @@ declare global {
         password: string;
     }
 
-    type InfoProps = 'player-info' | 'barangay-info' | 'coach-info'
+    type InfoProps = 'player-info' | 'barangay-info' | 'coach-info' | 'team-info' | 'sport-info'
 
     type FallbackProps = {
         show: boolean;
@@ -31,6 +31,13 @@ declare global {
         content: string;
     }
 
+    type SportProps = {
+        id?: string;
+        name: string;
+        dateAdded?: number;
+        dateUpdated?: number;
+    }
+
     type CoachProps = {
         id?: string;
         profile: string;
@@ -43,6 +50,7 @@ declare global {
         age: string;
         dateAdded?: number;
         dateUpdated?: number;
+        selected?: boolean;
     }
 
     type PlayerProps = {
@@ -59,6 +67,25 @@ declare global {
         age: string;
         achivements: Array;
         videos: Array;
+        dateAdded?: number;
+        dateUpdated?: number;
+        selected?: boolean;
+    }
+
+    type TeamPlayerProps = {
+        id?: string;
+        profile: string;
+        lastName: string;
+        firstName: string;
+    }
+
+    type TeamProps = {
+        id?: string;
+        name: string;
+        profile: string;
+        sport: string;
+        coach: string;
+        players: TeamPlayerProps[];
         dateAdded?: number;
         dateUpdated?: number;
     }

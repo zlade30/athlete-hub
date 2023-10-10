@@ -2,12 +2,14 @@
 
 import { useAppSelector } from '@/redux/store';
 import { BarangayInformation } from '../features/barangay';
-import { PlayerInformation } from '../features/players';
 import Image from 'next/image';
 import { defaultProfileImg } from '@/public/images';
 import { useEffect, useState } from 'react';
 import { User } from 'firebase/auth';
-import { CoachInformation } from '../features/coaches';
+import { CoachesInformation } from '../features/coaches';
+import { PlayersInformation } from '../features/players';
+import { TeamInformation } from '../features/teams';
+import { SportsInformation } from '../features/sports';
 
 const Information = () => {
     const { currentInfo } = useAppSelector((state) => state.app);
@@ -15,8 +17,10 @@ const Information = () => {
 
     const renderInformation = () => {
         if (currentInfo === 'barangay-info') return <BarangayInformation />;
-        else if (currentInfo === 'player-info') return <PlayerInformation />;
-        else if (currentInfo === 'coach-info') return <CoachInformation />;
+        else if (currentInfo === 'player-info') return <PlayersInformation />;
+        else if (currentInfo === 'coach-info') return <CoachesInformation />;
+        else if (currentInfo === 'team-info') return <TeamInformation />;
+        else if (currentInfo === 'sport-info') return <SportsInformation />;
     };
 
     useEffect(() => {
@@ -38,7 +42,7 @@ const Information = () => {
                     height={35}
                 />
             </div>
-            {renderInformation()}
+            <div className="flex-1 overflow-y-auto">{renderInformation()}</div>
         </section>
     );
 };

@@ -2,6 +2,7 @@
 
 import { twMerge } from 'tailwind-merge';
 import { InputHTMLAttributes, useCallback, useEffect, useState } from 'react';
+import { ChevronIcon } from '@/public/icons';
 
 const Select = ({
     data,
@@ -42,13 +43,22 @@ const Select = ({
             </label>
             <input
                 type="text"
-                readOnly
+                autoComplete="off"
                 onClick={() => setShowData(true)}
                 className={twMerge(
                     'h-[40px] rounded-[8px] border border-primary px-[10px] text-[14px] capitalize cursor-default',
                     className
                 )}
                 {...props}
+            />
+            <ChevronIcon
+                className={twMerge(
+                    'absolute bottom-0 right-0 text-primary w-[15px] h-[15px] mr-[12px]',
+                    `
+                        ${showData ? 'rotate-90' : '-rotate-90'}
+                        ${error ? 'mb-[35px]' : 'mb-[12px]'}
+                    `
+                )}
             />
             {showData && (
                 <div className="w-full max-h-[300px] bg-white rounded-[8px] absolute mt-[70px] shadow-[0px_10px_10px_1px_rgba(0,0,0,0.10)] border border-gray-100 z-[100] overflow-y-auto">

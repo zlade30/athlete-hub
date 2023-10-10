@@ -2,7 +2,7 @@ import { Header, Modal, Sidebar, Information } from '@/components/shared';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="w-full h-screen flex items-start">
+        <div className="w-full h-screen flex items-start overflow-hidden">
             <Sidebar />
             <div className="w-full h-full flex flex-col">
                 <Header />

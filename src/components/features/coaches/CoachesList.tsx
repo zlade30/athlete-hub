@@ -17,7 +17,7 @@ import { fbGetCoaches } from '@/firebase-api/coaches';
 import { setCoaches } from '@/redux/reducers/coaches';
 import { CoachesReport } from '.';
 
-const CoachList = () => {
+const CoachesList = () => {
     const coachesReportRef = useRef();
     const dispatch = useDispatch();
     const { showSpinnerFallback } = useAppSelector((state) => state.app);
@@ -161,4 +161,4 @@ const CoachList = () => {
     );
 };
 
-export default CoachList;
+export default CoachesList;
