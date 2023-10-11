@@ -88,6 +88,7 @@ declare global {
         players: TeamPlayerProps[];
         dateAdded?: number;
         dateUpdated?: number;
+        selected?: boolean;
     }
 
     type ModalProps = {

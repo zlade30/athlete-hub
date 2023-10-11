@@ -1,6 +1,6 @@
 'use client';
 
-import { PersonBox, SelectPersonBox } from '@/components/shared';
+import { Modal, PersonBox, SelectPersonBox } from '@/components/shared';
 import { useAppSelector } from '@/redux/store';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -12,10 +12,10 @@ import { Input } from '@/components/shared/textfields';
 import { FallbackEmpty, FallbackSpinner } from '@/components/shared/fallbacks';
 import { Select } from '@/components/shared/options';
 import { getSports } from '@/firebase-api/utils';
-import { SpinnerDialog } from '@/components/shared/dialogs';
-import { setIsPlayerSelection, setSelectedPlayers } from '@/redux/reducers/teams';
+import { setSelectedPlayers } from '@/redux/reducers/teams';
+import { Button } from '@/components/shared/buttons';
 
-const TeamPlayersSelection = () => {
+const TeamPlayersSelection = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
     const { showSpinnerFallback } = useAppSelector((state) => state.app);
     const { players } = useAppSelector((state) => state.player);
@@ -82,10 +82,6 @@ const TeamPlayersSelection = () => {
         setSearchPlayer('');
     };
 
-    const handleCancel = () => {
-        dispatch(setIsPlayerSelection(false));
-    };
-
     const handleSelectedPerson = (person: PlayerProps | CoachProps) => {
         const selectedPerson = person as PlayerProps;
         const updateList = playerList.map((item) =>
@@ -98,6 +94,10 @@ const TeamPlayersSelection = () => {
             const removePlayer = selectedPlayers.filter((item) => item.id !== selectedPerson.id);
             dispatch(setSelectedPlayers(removePlayer));
         }
+    };
+
+    const onClose = () => {
+        handleClose();
     };
 
     useEffect(() => {
@@ -123,40 +123,48 @@ const TeamPlayersSelection = () => {
     }, []);
 
     return (
-        <div className="w-full h-full flex flex-col overflow-y-auto relative">
-            <SpinnerDialog />
-            <div className="w-full p-[20px] flex items-center justify-between gap-[20px]">
-                <div className="w-full flex items-center gap-[20px]">
-                    <Select
-                        containerClassName="w-[200px] flex flex-col gap-[4px]"
-                        label="Sports"
-                        value={selectedSport}
-                        data={sportList! || []}
-                        onSelectItem={handleSelectedItem}
-                    />
-                    <Input
-                        containerClassName="w-[300px] flex flex-col gap-[4px]"
-                        label="Search Player"
-                        type="text"
-                        className="normal-case"
-                        value={searchPlayer}
-                        onChange={handleSearch}
-                    />
+        <Modal open={open} handleClose={onClose}>
+            <div className="w-screen h-screen flex flex-col overflow-y-auto relative bg-white">
+                <div className="w-full p-[20px] flex items-center justify-between gap-[20px]">
+                    <div className="w-full flex items-center gap-[20px]">
+                        <Select
+                            containerClassName="w-[200px] flex flex-col gap-[4px]"
+                            label="Sports"
+                            value={selectedSport}
+                            data={sportList! || []}
+                            onSelectItem={handleSelectedItem}
+                        />
+                        <Input
+                            containerClassName="w-[300px] flex flex-col gap-[4px]"
+                            label="Search Player"
+                            type="text"
+                            className="normal-case"
+                            value={searchPlayer}
+                            onChange={handleSearch}
+                        />
+                    </div>
+                    <Button className="w-[100px]" onClick={onClose} value="Done" />
                 </div>
-                <CancelIcon onClick={handleCancel} className="w-[18px] h-[18px] cursor-pointer" />
+                {showSpinnerFallback.show && <FallbackSpinner content="Fetching players..." />}
+                {playerList.length === 0 && !showSpinnerFallback.show && (
+                    <FallbackEmpty
+                        icon={<UserIcon className="w-[50px] h-[50px]" />}
+                        content="List is currently empty."
+                    />
+                )}
+                {!showSpinnerFallback.show && (
+                    <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto">
+                        {playerList.map((player) => (
+                            <SelectPersonBox
+                                key={player.id}
+                                person={player}
+                                handleSelectedPerson={handleSelectedPerson}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
-            {showSpinnerFallback.show && <FallbackSpinner content="Fetching players..." />}
-            {playerList.length === 0 && !showSpinnerFallback.show && (
-                <FallbackEmpty icon={<UserIcon className="w-[50px] h-[50px]" />} content="List is currently empty." />
-            )}
-            {!showSpinnerFallback.show && (
-                <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto">
-                    {playerList.map((player) => (
-                        <SelectPersonBox key={player.id} person={player} handleSelectedPerson={handleSelectedPerson} />
-                    ))}
-                </div>
-            )}
-        </div>
+        </Modal>
     );
 };
 

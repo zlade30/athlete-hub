@@ -18,7 +18,7 @@ const SelectPersonBox = ({
             {...props}
             onClick={() => handleSelectedPerson(person)}
             className={twMerge(
-                'bg-white group w-[200px] h-[200px] rounded-[8px] flex flex-col items-center p-[20px] hover:bg-[#d5d6db] cursor-pointer',
+                'bg-white group w-[200px] h-[200px] rounded-[8px] flex flex-col items-center p-[20px] hover:bg-[#d5d6db] cursor-pointer border border-primary',
                 person?.selected && 'bg-[#d5d6db]'
             )}
         >

@@ -3,6 +3,7 @@ import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase
 
 export const fbAddCoach = async (payload: CoachProps) => {
     try {
+        delete payload.selected;
         const result = await addDoc(collection(db, 'coaches'), payload);
         return { ...payload, id: result.id }
     } catch (error) {
@@ -32,6 +33,7 @@ export const fbDeleteCoach = async (id: string) => {
 
 export const fbUpdateCoach = async (coach: CoachProps) => {
     try {
+        delete coach.selected;
         await updateDoc(doc(db, 'coaches', coach.id!), { ...coach })
         return coach as CoachProps;
     } catch (error) {

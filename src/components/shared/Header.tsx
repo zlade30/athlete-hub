@@ -1,50 +1,23 @@
 'use client';
 
-import { useDispatch } from 'react-redux';
-import { Button } from './buttons';
 import { usePathname } from 'next/navigation';
-import { setSelectedPlayer } from '@/redux/reducers/players';
-import { setCurrentInfo } from '@/redux/reducers/app';
 import { useAppSelector } from '@/redux/store';
 import { useEffect, useState } from 'react';
-import { setSelectedCoach } from '@/redux/reducers/coaches';
-import { setSelectedPlayers, setSelectedTeam } from '@/redux/reducers/teams';
-import { setSelectedSport } from '@/redux/reducers/sports';
+import Image from 'next/image';
+import { User } from 'firebase/auth';
+import { defaultProfileImg } from '@/public/images';
 
 const Header = () => {
-    const dispatch = useDispatch();
     const path = usePathname()?.replace('/', '');
+    const [currentUser, setCurrentUser] = useState<User>();
     const title = path ? path.charAt(0).toUpperCase() + path.slice(1) : 'All';
     const { selectedBarangay } = useAppSelector((state) => state.barangay);
-    const [isGuest, setIsGuest] = useState(false);
-
-    const handleClick = () => {
-        if (path === 'players') {
-            dispatch(setCurrentInfo('player-info'));
-            dispatch(setSelectedPlayer(undefined));
-        } else if (path === 'coaches') {
-            dispatch(setCurrentInfo('coach-info'));
-            dispatch(setSelectedCoach(undefined));
-        } else if (path === 'teams') {
-            dispatch(setCurrentInfo('team-info'));
-            dispatch(setSelectedTeam(undefined));
-            dispatch(setSelectedPlayers([]));
-        } else if (path === 'sports') {
-            dispatch(setCurrentInfo('sport-info'));
-            dispatch(setSelectedSport(undefined));
-        }
-    };
-
-    const handleBtnText = () => {
-        if (path === 'players') return 'New Player';
-        else if (path === 'coaches') return 'New Coach';
-        else if (path === 'teams') return 'New Team';
-        else if (path === 'sports') return 'New Sport';
-        return '';
-    };
 
     useEffect(() => {
-        setIsGuest(localStorage.getItem('id') === 'guest');
+        const user: User = JSON.parse(localStorage.getItem('user')!);
+        if (user) {
+            setCurrentUser(user);
+        }
     }, []);
 
     return (
@@ -53,9 +26,20 @@ const Header = () => {
                 <div className="flex items-center gap-[20px]">
                     <p className="text-[24px] font-bold">{title}</p>
                     {selectedBarangay !== 'All' && <div className="w-[2px] h-[30px] bg-gray-400" />}
-                    <p className="text-[24px] font-bold">{selectedBarangay === 'All' ? '' : selectedBarangay}</p>
+                    <p className="text-[24px] font-bold whitespace-nowrap">
+                        {selectedBarangay === 'All' ? '' : selectedBarangay}
+                    </p>
                 </div>
-                {!isGuest && <Button onClick={handleClick} value={handleBtnText()} className="w-[150px]" />}
+                <div className="w-full h-[60px] flex items-center gap-[20px] justify-end border-b border-b-gray-200">
+                    <p className="font-medium">{currentUser?.email}</p>
+                    <Image
+                        className="cursor-pointer"
+                        src={currentUser?.photoURL! || defaultProfileImg}
+                        alt="profile"
+                        width={35}
+                        height={35}
+                    />
+                </div>
             </div>
         </header>
     );

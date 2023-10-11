@@ -4,25 +4,26 @@ import { PersonBox } from '@/components/shared';
 import { useAppSelector } from '@/redux/store';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setPlayers } from '@/redux/reducers/players';
-import { ExportIcon, PrintIcon, UserIcon } from '@/public/icons';
+import { setPlayers, setShowPlayerInformation } from '@/redux/reducers/players';
+import { ExportIcon, PlusIcon, PrintIcon, UserIcon } from '@/public/icons';
 import { setShowSpinnerFallback } from '@/redux/reducers/app';
 import { fbGetPlayers } from '@/firebase-api/player';
 import { Input } from '@/components/shared/textfields';
 import { FallbackEmpty, FallbackSpinner } from '@/components/shared/fallbacks';
 import { Select } from '@/components/shared/options';
-import { getSports } from '@/firebase-api/utils';
+import { getBarangay, getSports } from '@/firebase-api/utils';
 import { SpinnerDialog } from '@/components/shared/dialogs';
 import Papa from 'papaparse';
 import ReactToPrint from 'react-to-print';
-import { PlayersReport } from '.';
+import { PlayersInformation, PlayersReport } from '.';
+import { setBarangayList, setSelectedBarangay } from '@/redux/reducers/barangay';
 
 const PlayersList = () => {
     const playersReportRef = useRef();
     const dispatch = useDispatch();
     const { showSpinnerFallback } = useAppSelector((state) => state.app);
-    const { players } = useAppSelector((state) => state.player);
-    const { selectedBarangay } = useAppSelector((state) => state.barangay);
+    const { players, showPlayerInformation } = useAppSelector((state) => state.player);
+    const { selectedBarangay, barangayList } = useAppSelector((state) => state.barangay);
     const [playerList, setPlayerList] = useState<PlayerProps[]>([]);
     const [sportList, setSportList] = useState<SportsProps[]>([]);
     const [searchPlayer, setSearchPlayer] = useState('');
@@ -80,6 +81,13 @@ const PlayersList = () => {
         } catch (error) {}
     };
 
+    const loadBarangay = async () => {
+        try {
+            const list = await getBarangay();
+            dispatch(setBarangayList(list));
+        } catch (error) {}
+    };
+
     const handleSearch = (evt: ChangeEvent<HTMLInputElement>) => {
         const value = evt.target.value;
         const result = players.filter((item) =>
@@ -90,9 +98,13 @@ const PlayersList = () => {
         setSearchPlayer(evt.target.value);
     };
 
-    const handleSelectedItem = (item: SportsProps) => {
+    const handleSelectedSport = (item: SportsProps) => {
         setSelectedSport(item.value);
         setSearchPlayer('');
+    };
+
+    const handleSelectedBarangay = (option: SelectPropsData) => {
+        dispatch(setSelectedBarangay(option.value));
     };
 
     useEffect(() => {
@@ -107,10 +119,15 @@ const PlayersList = () => {
     useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
         loadSports();
+        loadBarangay();
     }, []);
 
     return (
         <div className="w-full h-full flex flex-col overflow-y-auto relative">
+            <PlayersInformation
+                open={showPlayerInformation}
+                handleClose={() => dispatch(setShowPlayerInformation(false))}
+            />
             <SpinnerDialog />
             <PlayersReport
                 ref={playersReportRef}
@@ -125,7 +142,14 @@ const PlayersList = () => {
                         label="Sports"
                         value={selectedSport}
                         data={sportList! || []}
-                        onSelectItem={handleSelectedItem}
+                        onSelectItem={handleSelectedSport}
+                    />
+                    <Select
+                        containerClassName="w-[200px] flex flex-col gap-[4px]"
+                        label="Barangay"
+                        value={selectedBarangay}
+                        data={barangayList! || []}
+                        onSelectItem={handleSelectedBarangay}
                     />
                     <Input
                         containerClassName="w-[300px] flex flex-col gap-[4px]"
@@ -143,6 +167,10 @@ const PlayersList = () => {
                             trigger={() => <PrintIcon className="w-[30px] h-[30px] cursor-pointer" />}
                             content={() => playersReportRef.current!}
                         />
+                        <PlusIcon
+                            onClick={() => dispatch(setShowPlayerInformation(true))}
+                            className="w-[20px] h-[20px] cursor-pointer"
+                        />
                     </div>
                 )}
             </div>
@@ -151,7 +179,7 @@ const PlayersList = () => {
                 <FallbackEmpty icon={<UserIcon className="w-[50px] h-[50px]" />} content="List is currently empty." />
             )}
             {!showSpinnerFallback.show && (
-                <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto">
+                <div className="px-[20px] flex flex-wrap gap-[26px] columns-auto">
                     {playerList.map((player) => (
                         <PersonBox key={player.id} person={player} />
                     ))}

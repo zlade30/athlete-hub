@@ -3,16 +3,12 @@ import { printDate } from '@/utils/helpers';
 import Image from 'next/image';
 import React, { forwardRef, useRef } from 'react';
 
-const CoachesReport = forwardRef(
+const TeamReport = forwardRef(
     (
         {
-            coachList,
-            selectedSport,
-            selectedBarangay
+            teamList
         }: {
-            coachList: CoachProps[];
-            selectedSport: string;
-            selectedBarangay: string;
+            teamList: TeamProps[];
         },
         ref
     ) => {
@@ -26,6 +22,24 @@ const CoachesReport = forwardRef(
             }
         }
 
+        const renderList = () => {
+            let count = 0;
+            return teamList.map((team) => {
+                return team.players.map((player) => {
+                    count++;
+                    return (
+                        <tr key={player.id} className="h-[30px]">
+                            <td>{count}</td>
+                            <td>{`${team.name}`}</td>
+                            <td>{`${team.coach}`}</td>
+                            <td>{`${player.firstName} ${player.lastName}`}</td>
+                            <td>{`${team.sport}`}</td>
+                        </tr>
+                    );
+                });
+            });
+        };
+
         return (
             <div className="hidden">
                 <div
@@ -37,43 +51,27 @@ const CoachesReport = forwardRef(
                         <h1 className="font-bold text-[14px]">Municipality of Manolo Fortich Bukidnon</h1>
                         <Image src={lguImg} width={80} height={80} alt="lgu" />
                     </div>
-                    <h1 className="text-[20px]">List of Coaches</h1>
-                    <div className="w-full flex items-center justify-between text-[14px] py-[20px]">
-                        <div className="flex items-center gap-[10px]">
-                            <p>
-                                <b>Sport:</b> {selectedSport}
-                            </p>
-                            <p>
-                                <b>Barangay:</b> {selectedBarangay}
-                            </p>
-                        </div>
+                    <h1 className="text-[20px]">List of Teams</h1>
+                    <div className="w-full flex items-center justify-end text-[14px] py-[20px]">
                         <p>{printDate()}</p>
                     </div>
                     <table className="w-full table-auto text-[14px]">
                         <thead className="h-[40px]">
                             <tr>
                                 <th align="left" className="w-[40px]"></th>
-                                <th align="left">Name</th>
-                                <th align="right">Age</th>
-                                <th align="right">Sport</th>
+                                <th align="left">Team Name</th>
+                                <th align="left">Coach</th>
+                                <th align="left">Player</th>
+                                <th align="left">Sport</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {coachList.map((item, key) => (
-                                <tr key={item.id} className="h-[30px]">
-                                    <td>{key + 1}</td>
-                                    <td>{`${item.firstName} ${item.lastName}`}</td>
-                                    <td align="right">{item.age}</td>
-                                    <td align="right">{item.sport}</td>
-                                </tr>
-                            ))}
-                        </tbody>
+                        <tbody>{renderList()}</tbody>
                     </table>
                 </div>
             </div>
         );
     }
 );
-CoachesReport.displayName = 'CoachesReport';
+TeamReport.displayName = 'TeamReport';
 
-export default CoachesReport;
+export default TeamReport;

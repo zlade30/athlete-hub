@@ -8,9 +8,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Header />
                 <main className="w-full flex-1 bg-secondary flex items-start justify-center">{children}</main>
             </div>
-            <div>
-                <Information />
-            </div>
         </div>
     );
 }

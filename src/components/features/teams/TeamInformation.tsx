@@ -19,9 +19,10 @@ import { fbAddTeam, fbDeleteTeam, fbUpdateTeam } from '@/firebase-api/teams';
 import {
     createTeam,
     removeTeam,
-    setIsPlayerSelection,
     setSelectedPlayers,
     setSelectedTeam,
+    setShowTeamInformation,
+    setShowTeamPlayerSelection,
     updateTeam
 } from '@/redux/reducers/teams';
 import { fbGetPlayers } from '@/firebase-api/player';
@@ -29,8 +30,9 @@ import { fbGetCoaches } from '@/firebase-api/coaches';
 import { useDebouncedCallback } from 'use-debounce';
 import { CancelIcon } from '@/public/icons';
 import { TeamPlayerBox } from '.';
+import { Modal } from '@/components/shared';
 
-const TeamInformation = () => {
+const TeamInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
     const { selectedTeam, selectedPlayers } = useAppSelector((state) => state.teams);
     const [sports, setSports] = useState<SelectPropsData[]>();
@@ -39,7 +41,7 @@ const TeamInformation = () => {
     const [isSubmit, setIsSubmit] = useState(false);
     const [selectedPhoto, setSelectedPhoto] = useState<File>();
     const isUpdate = selectedTeam?.id;
-    const isGuest = localStorage.getItem('id') === 'guest';
+    const [isGuest, setIsGuest] = useState(false);
 
     const schema = yup.object().shape({
         profile: yup.string().notRequired(),
@@ -69,6 +71,7 @@ const TeamInformation = () => {
                             content: isUpdate ? 'Updating a team...' : 'Adding a team...'
                         })
                     );
+                    dispatch(setShowTeamInformation(false));
                     let result;
                     let profile = '';
                     let name = values.name.charAt(0).toUpperCase() + values.name.slice(1);
@@ -103,7 +106,6 @@ const TeamInformation = () => {
                     }
                     setSelectedPhoto(undefined);
                     dispatch(setShowSpinnerDialog({ open: false, content: '' }));
-                    dispatch(setIsPlayerSelection(false));
                 }
             } catch (error) {
                 console.log(error);
@@ -113,9 +115,11 @@ const TeamInformation = () => {
         }
     });
 
-    const handleClose = () => {
+    const onClose = () => {
         dispatch(setCurrentInfo('barangay-info'));
         dispatch(setSelectedTeam(undefined));
+        handleClose();
+        formik.resetForm();
     };
 
     const loadData = async () => {
@@ -136,6 +140,7 @@ const TeamInformation = () => {
     const handleDelete = async () => {
         try {
             dispatch(setShowSpinnerDialog({ open: true, content: 'Removing coach...' }));
+            dispatch(setShowTeamInformation(false));
             await fbDeleteTeam(selectedTeam?.id!);
             dispatch(removeTeam(selectedTeam?.id!));
             dispatch(setShowSpinnerDialog({ open: false, content: '' }));
@@ -149,7 +154,7 @@ const TeamInformation = () => {
     };
 
     const handleSelectPlayers = () => {
-        dispatch(setIsPlayerSelection(true));
+        dispatch(setShowTeamPlayerSelection(true));
     };
 
     useEffect(() => {
@@ -157,6 +162,7 @@ const TeamInformation = () => {
     }, [selectedPlayers]);
 
     useEffect(() => {
+        setIsGuest(localStorage.getItem('id') === 'guest');
         loadData();
     }, []);
 
@@ -170,116 +176,116 @@ const TeamInformation = () => {
     }, [selectedTeam]);
 
     return (
-        <>
-            <header className="flex items-center justify-between p-[20px]">
-                <p className="text-[18px] font-bold">{isUpdate ? 'Update Team' : 'Add Team'}</p>
-                <Button
-                    className="w-[100px] bg-transparent text-primary font-medium hover:bg-secondary"
-                    value="Close"
-                    onClick={handleClose}
-                />
-            </header>
-            <form onSubmit={formik.handleSubmit} className="relative w-full grid grid-cols-4 gap-[10px] p-[20px]">
-                <div className="col-span-4 py-[20px] flex items-center justify-center">
-                    <label>
-                        <input
-                            disabled={isGuest}
-                            multiple
-                            type="file"
-                            className="hidden"
-                            accept=".png, .jpg, .jpeg"
-                            onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-                                if (evt.target.files) {
-                                    const file = evt.target.files[0];
-                                    const url = URL.createObjectURL(file);
-                                    setSelectedPhoto(file);
-                                    formik.setFieldValue('profile', url);
-                                }
-                            }}
-                        />
-                        {formik.values.profile ? (
-                            <Image
-                                src={formik.values.profile}
-                                className="rounded-[100px] object-cover w-[100px] h-[100px]"
-                                alt="profile"
-                                width={100}
-                                height={100}
+        <Modal open={open} handleClose={onClose}>
+            <section className="w-[400px] h-[800px] bg-white rounded-[8px] overflow-y-auto">
+                <header className="flex items-center justify-between p-[20px]">
+                    <p className="text-[18px] font-bold">{isUpdate ? 'Update Team' : 'Add Team'}</p>
+                    <CancelIcon onClick={onClose} className="w-[18px] h-[18px] text-error cursor-pointer" />
+                </header>
+                <form onSubmit={formik.handleSubmit} className="relative w-full grid grid-cols-4 gap-[10px] p-[20px]">
+                    <div className="col-span-4 py-[20px] flex items-center justify-center">
+                        <label>
+                            <input
+                                disabled={isGuest}
+                                multiple
+                                type="file"
+                                className="hidden"
+                                accept=".png, .jpg, .jpeg"
+                                onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+                                    if (evt.target.files) {
+                                        const file = evt.target.files[0];
+                                        const url = URL.createObjectURL(file);
+                                        setSelectedPhoto(file);
+                                        formik.setFieldValue('profile', url);
+                                    }
+                                }}
                             />
-                        ) : (
-                            <Image src={defaultProfileImg} alt="profile" width={100} height={100} />
-                        )}
-                    </label>
-                </div>
-                <Input
-                    disabled={isGuest}
-                    containerClassName="col-span-4 flex flex-col gap-[4px]"
-                    label="Name"
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    error={formik.errors.name}
-                />
-                <Select
-                    readOnly
-                    disabled={isGuest}
-                    containerClassName="col-span-4 flex flex-col gap-[4px]"
-                    label="Sport"
-                    id="sport"
-                    name="sport"
-                    value={formik.values.sport}
-                    error={formik.errors.sport}
-                    data={sports || defaultOptionData()}
-                    onSelectItem={(item: SelectPropsData) => {
-                        formik.setFieldValue('sport', item.value);
-                    }}
-                />
-                <Select
-                    readOnly
-                    disabled={isGuest}
-                    containerClassName="col-span-4 flex flex-col gap-[4px]"
-                    label="Coach"
-                    id="coach"
-                    name="coach"
-                    value={formik.values.coach}
-                    error={formik.errors.coach}
-                    data={coaches || defaultOptionData()}
-                    onSelectItem={(item: SelectPropsData) => {
-                        formik.setFieldValue('coach', item.value);
-                    }}
-                />
-                <div className="col-span-4 grid grid-cols-2 gap-[10px]">
-                    {players?.map((player) => (
-                        <TeamPlayerBox key={player.id} player={player} />
-                    ))}
-                    <div className="col-span-2 flex items-center justify-center">
-                        <Button
-                            type="button"
-                            onClick={handleSelectPlayers}
-                            value="Select Players"
-                            className="w-[140px] bg-transparent text-primary hover:bg-secondary"
-                        />
+                            {formik.values.profile ? (
+                                <Image
+                                    src={formik.values.profile}
+                                    className="rounded-[100px] object-cover w-[100px] h-[100px]"
+                                    alt="profile"
+                                    width={100}
+                                    height={100}
+                                />
+                            ) : (
+                                <Image src={defaultProfileImg} alt="profile" width={100} height={100} />
+                            )}
+                        </label>
                     </div>
-                </div>
-                {!players?.length && isSubmit && (
-                    <span className="text-error text-[14px] col-span-4 text-center">Players should not be empty.</span>
-                )}
-                {!isGuest && (
-                    <div className="col-span-4 pt-[80px] flex items-center justify-center gap-[40px]">
-                        <Button type="submit" value="Save" className="w-[100px]" />
-                        {isUpdate && (
+                    <Input
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="Name"
+                        id="name"
+                        name="name"
+                        type="text"
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        error={formik.errors.name}
+                    />
+                    <Select
+                        readOnly
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="Sport"
+                        id="sport"
+                        name="sport"
+                        value={formik.values.sport}
+                        error={formik.errors.sport}
+                        data={sports || defaultOptionData()}
+                        onSelectItem={(item: SelectPropsData) => {
+                            formik.setFieldValue('sport', item.value);
+                        }}
+                    />
+                    <Select
+                        readOnly
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="Coach"
+                        id="coach"
+                        name="coach"
+                        value={formik.values.coach}
+                        error={formik.errors.coach}
+                        data={coaches || defaultOptionData()}
+                        onSelectItem={(item: SelectPropsData) => {
+                            formik.setFieldValue('coach', item.value);
+                        }}
+                    />
+                    <div className="col-span-4 grid grid-cols-2 gap-[10px]">
+                        {players?.map((player) => (
+                            <TeamPlayerBox key={player.id} player={player} />
+                        ))}
+                        <div className="col-span-2 flex items-center justify-center">
                             <Button
                                 type="button"
-                                onClick={handleDelete}
-                                value="Delete"
-                                className="w-[100px] bg-error"
+                                onClick={handleSelectPlayers}
+                                value="Select Players"
+                                className="w-[140px] bg-transparent text-primary hover:bg-secondary"
                             />
-                        )}
+                        </div>
                     </div>
-                )}
-            </form>
-        </>
+                    {!players?.length && isSubmit && (
+                        <span className="text-error text-[14px] col-span-4 text-center">
+                            Players should not be empty.
+                        </span>
+                    )}
+                    {!isGuest && (
+                        <div className="col-span-4 pt-[80px] flex items-center justify-center gap-[40px]">
+                            <Button type="submit" value="Save" className="w-[100px]" />
+                            {isUpdate && (
+                                <Button
+                                    type="button"
+                                    onClick={handleDelete}
+                                    value="Delete"
+                                    className="w-[100px] bg-error"
+                                />
+                            )}
+                        </div>
+                    )}
+                </form>
+            </section>
+        </Modal>
     );
 };
 

@@ -3,11 +3,13 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 type InitialStateProps = {
     coaches: CoachProps[];
     selectedCoach: CoachProps | undefined;
+    showCoachInformation: boolean;
 };
 
 const initialState: InitialStateProps = {
     coaches: [],
     selectedCoach: undefined,
+    showCoachInformation: false
 };
 
 export const slice = createSlice({
@@ -28,7 +30,10 @@ export const slice = createSlice({
         },
         setSelectedCoach: (state, action: PayloadAction<CoachProps | undefined>) => {
             state.selectedCoach = action.payload
-        }
+        },
+        setShowCoachInformation: (state, action: PayloadAction<boolean>) => {
+            state.showCoachInformation = action.payload
+        },
     }
 });
 
@@ -38,6 +43,7 @@ export const {
     createCoach,
     removeCoach,
     setSelectedCoach,
+    setShowCoachInformation
 } = slice.actions;
 
 export default slice.reducer;

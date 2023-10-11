@@ -4,25 +4,26 @@ import { PersonBox } from '@/components/shared';
 import { useAppSelector } from '@/redux/store';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { ExportIcon, PrintIcon, UserIcon } from '@/public/icons';
+import { ExportIcon, PlusIcon, PrintIcon, UserIcon } from '@/public/icons';
 import { setShowSpinnerFallback } from '@/redux/reducers/app';
 import { Input } from '@/components/shared/textfields';
 import { FallbackEmpty, FallbackSpinner } from '@/components/shared/fallbacks';
 import { Select } from '@/components/shared/options';
-import { getSports } from '@/firebase-api/utils';
+import { getBarangay, getSports } from '@/firebase-api/utils';
 import { SpinnerDialog } from '@/components/shared/dialogs';
 import Papa from 'papaparse';
 import ReactToPrint from 'react-to-print';
 import { fbGetCoaches } from '@/firebase-api/coaches';
-import { setCoaches } from '@/redux/reducers/coaches';
-import { CoachesReport } from '.';
+import { setCoaches, setShowCoachInformation } from '@/redux/reducers/coaches';
+import { CoachesInformation, CoachesReport } from '.';
+import { setBarangayList, setSelectedBarangay } from '@/redux/reducers/barangay';
 
 const CoachesList = () => {
     const coachesReportRef = useRef();
     const dispatch = useDispatch();
     const { showSpinnerFallback } = useAppSelector((state) => state.app);
-    const { coaches } = useAppSelector((state) => state.coaches);
-    const { selectedBarangay } = useAppSelector((state) => state.barangay);
+    const { coaches, showCoachInformation } = useAppSelector((state) => state.coaches);
+    const { selectedBarangay, barangayList } = useAppSelector((state) => state.barangay);
     const [coachList, setCoachList] = useState<CoachProps[]>([]);
     const [sportList, setSportList] = useState<SportsProps[]>([]);
     const [searchCoach, setSearchCoach] = useState('');
@@ -80,6 +81,13 @@ const CoachesList = () => {
         } catch (error) {}
     };
 
+    const loadBarangay = async () => {
+        try {
+            const list = await getBarangay();
+            dispatch(setBarangayList(list));
+        } catch (error) {}
+    };
+
     const handleSearch = (evt: ChangeEvent<HTMLInputElement>) => {
         const value = evt.target.value;
         const result = coaches.filter((item) =>
@@ -90,9 +98,13 @@ const CoachesList = () => {
         setSearchCoach(evt.target.value);
     };
 
-    const handleSelectedItem = (item: SportsProps) => {
+    const handleSelectedSport = (item: SportsProps) => {
         setSelectedSport(item.value);
         setSearchCoach('');
+    };
+
+    const handleSelectedBarangay = (option: SelectPropsData) => {
+        dispatch(setSelectedBarangay(option.value));
     };
 
     useEffect(() => {
@@ -107,10 +119,15 @@ const CoachesList = () => {
     useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
         loadSports();
+        loadBarangay();
     }, []);
 
     return (
         <div className="w-full h-full flex flex-col overflow-y-auto relative">
+            <CoachesInformation
+                open={showCoachInformation}
+                handleClose={() => dispatch(setShowCoachInformation(false))}
+            />
             <SpinnerDialog />
             <CoachesReport
                 ref={coachesReportRef}
@@ -125,7 +142,14 @@ const CoachesList = () => {
                         label="Sports"
                         value={selectedSport}
                         data={sportList! || []}
-                        onSelectItem={handleSelectedItem}
+                        onSelectItem={handleSelectedBarangay}
+                    />
+                    <Select
+                        containerClassName="w-[200px] flex flex-col gap-[4px]"
+                        label="Barangay"
+                        value={selectedBarangay}
+                        data={barangayList! || []}
+                        onSelectItem={handleSelectedBarangay}
                     />
                     <Input
                         containerClassName="w-[300px] flex flex-col gap-[4px]"
@@ -142,6 +166,10 @@ const CoachesList = () => {
                         <ReactToPrint
                             trigger={() => <PrintIcon className="w-[30px] h-[30px] cursor-pointer" />}
                             content={() => coachesReportRef.current!}
+                        />
+                        <PlusIcon
+                            onClick={() => dispatch(setShowCoachInformation(true))}
+                            className="w-[20px] h-[20px] cursor-pointer"
                         />
                     </div>
                 )}

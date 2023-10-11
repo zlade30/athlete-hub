@@ -16,16 +16,24 @@ import { Input } from '@/components/shared/textfields';
 import { Select } from '@/components/shared/options';
 import { Button } from '@/components/shared/buttons';
 import { fbAddCoach, fbDeleteCoach, fbUpdateCoach } from '@/firebase-api/coaches';
-import { createCoach, removeCoach, setSelectedCoach, updateCoach } from '@/redux/reducers/coaches';
+import {
+    createCoach,
+    removeCoach,
+    setSelectedCoach,
+    setShowCoachInformation,
+    updateCoach
+} from '@/redux/reducers/coaches';
+import { Modal } from '@/components/shared';
+import { CancelIcon } from '@/public/icons';
 
-const CoachesInformation = () => {
+const CoachesInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
     const { selectedCoach } = useAppSelector((state) => state.coaches);
     const [barangay, setBarangay] = useState<SelectPropsData[]>();
     const [sports, setSports] = useState<SelectPropsData[]>();
     const [selectedPhoto, setSelectedPhoto] = useState<File>();
     const isUpdate = selectedCoach?.id;
-    const isGuest = localStorage.getItem('id') === 'guest';
+    const [isGuest, setIsGuest] = useState(false);
 
     const schema = yup.object().shape({
         profile: yup.string().notRequired(),
@@ -60,6 +68,7 @@ const CoachesInformation = () => {
                         content: isUpdate ? 'Updating a coach...' : 'Adding a coach...'
                     })
                 );
+                dispatch(setShowCoachInformation(false));
                 let result;
                 let profile = '';
                 let lastName = values.lastName.charAt(0).toUpperCase() + values.lastName.slice(1);
@@ -101,9 +110,11 @@ const CoachesInformation = () => {
         }
     });
 
-    const handleClose = () => {
+    const onClose = () => {
         dispatch(setCurrentInfo('barangay-info'));
         dispatch(setSelectedCoach(undefined));
+        handleClose();
+        formik.resetForm();
     };
 
     const loadData = async () => {
@@ -118,6 +129,7 @@ const CoachesInformation = () => {
     const handleDelete = async () => {
         try {
             dispatch(setShowSpinnerDialog({ open: true, content: 'Removing coach...' }));
+            dispatch(setShowCoachInformation(false));
             await fbDeleteCoach(selectedCoach?.id!);
             dispatch(removeCoach(selectedCoach?.id!));
             dispatch(setShowSpinnerDialog({ open: false, content: '' }));
@@ -129,6 +141,7 @@ const CoachesInformation = () => {
     };
 
     useEffect(() => {
+        setIsGuest(localStorage.getItem('id') === 'guest');
         loadData();
     }, []);
 
@@ -143,151 +156,148 @@ const CoachesInformation = () => {
     }, [selectedCoach]);
 
     return (
-        <>
-            <header className="flex items-center justify-between p-[20px]">
-                <p className="text-[18px] font-bold">{isUpdate ? 'Update Coach' : 'Add Coach'}</p>
-                <Button
-                    className="w-[100px] bg-transparent text-primary font-medium hover:bg-secondary"
-                    value="Close"
-                    onClick={handleClose}
-                />
-            </header>
-            <form onSubmit={formik.handleSubmit} className="relative w-full grid grid-cols-4 gap-[10px] p-[20px]">
-                <div className="col-span-4 py-[20px] flex items-center justify-center">
-                    <label>
-                        <input
-                            disabled={isGuest}
-                            multiple
-                            type="file"
-                            className="hidden"
-                            accept=".png, .jpg, .jpeg"
-                            onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-                                if (evt.target.files) {
-                                    const file = evt.target.files[0];
-                                    const url = URL.createObjectURL(file);
-                                    setSelectedPhoto(file);
-                                    formik.setFieldValue('profile', url);
-                                }
-                            }}
-                        />
-                        {formik.values.profile ? (
-                            <Image
-                                src={formik.values.profile}
-                                className="rounded-[100px] object-cover w-[100px] h-[100px]"
-                                alt="profile"
-                                width={100}
-                                height={100}
+        <Modal open={open} handleClose={onClose}>
+            <section className="w-[400px] h-full bg-white rounded-[8px]">
+                <header className="flex items-center justify-between p-[20px]">
+                    <p className="text-[18px] font-bold">{isUpdate ? 'Update Coach' : 'Add Coach'}</p>
+                    <CancelIcon onClick={onClose} className="w-[18px] h-[18px] text-error cursor-pointer" />
+                </header>
+                <form onSubmit={formik.handleSubmit} className="relative w-full grid grid-cols-4 gap-[10px] p-[20px]">
+                    <div className="col-span-4 py-[20px] flex items-center justify-center">
+                        <label>
+                            <input
+                                disabled={isGuest}
+                                multiple
+                                type="file"
+                                className="hidden"
+                                accept=".png, .jpg, .jpeg"
+                                onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+                                    if (evt.target.files) {
+                                        const file = evt.target.files[0];
+                                        const url = URL.createObjectURL(file);
+                                        setSelectedPhoto(file);
+                                        formik.setFieldValue('profile', url);
+                                    }
+                                }}
                             />
-                        ) : (
-                            <Image src={defaultProfileImg} alt="profile" width={100} height={100} />
-                        )}
-                    </label>
-                </div>
-                <Input
-                    disabled={isGuest}
-                    containerClassName="col-span-4 flex flex-col gap-[4px]"
-                    label="First Name"
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    value={formik.values.firstName}
-                    onChange={formik.handleChange}
-                    error={formik.errors.firstName}
-                />
-                <Input
-                    disabled={isGuest}
-                    containerClassName="col-span-4 flex flex-col gap-[4px]"
-                    label="Last Name"
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    value={formik.values.lastName}
-                    onChange={formik.handleChange}
-                    error={formik.errors.lastName}
-                />
-                <Select
-                    disabled={isGuest}
-                    containerClassName="col-span-4 flex flex-col gap-[4px]"
-                    label="Barangay"
-                    id="barangay"
-                    name="barangay"
-                    value={formik.values.barangay}
-                    error={formik.errors.barangay}
-                    data={barangay || defaultOptionData()}
-                    onSelectItem={(item: SelectPropsData) => {
-                        formik.setFieldValue('barangay', item.value);
-                    }}
-                />
-                <Select
-                    disabled={isGuest}
-                    containerClassName="col-span-2 flex flex-col gap-[4px]"
-                    label="Gender"
-                    id="gender"
-                    name="gender"
-                    value={formik.values.gender}
-                    error={formik.errors.gender}
-                    data={genderData()}
-                    onSelectItem={(item: SelectPropsData) => {
-                        formik.setFieldValue('gender', item.value);
-                    }}
-                />
-                <Select
-                    disabled={isGuest}
-                    containerClassName="col-span-2 flex flex-col gap-[4px]"
-                    label="Sport"
-                    id="sport"
-                    name="sport"
-                    value={formik.values.sport}
-                    error={formik.errors.sport}
-                    data={sports || defaultOptionData()}
-                    onSelectItem={(item: SelectPropsData) => {
-                        formik.setFieldValue('sport', item.value);
-                    }}
-                />
-                <Select
-                    disabled={isGuest}
-                    containerClassName="col-span-2 flex flex-col gap-[4px]"
-                    label="Suffix"
-                    id="suffix"
-                    name="suffix"
-                    value={formik.values.suffix}
-                    error={formik.errors.suffix}
-                    data={suffixData()}
-                    onSelectItem={(item: SelectPropsData) => {
-                        formik.setFieldValue('suffix', item.value);
-                    }}
-                />
-                <Input
-                    disabled={isGuest}
-                    containerClassName="col-span-2 flex flex-col gap-[4px]"
-                    label="Age"
-                    id="age"
-                    name="age"
-                    type="text"
-                    value={formik.values.age}
-                    onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-                        const value = evt.target.value;
-                        const numericValue = value.replace(/[^0-9.]/g, '');
-                        formik.setFieldValue('age', numericValue);
-                    }}
-                    error={formik.errors.age}
-                    pattern="[0-9]"
-                />
-                {!isGuest && (
-                    <div className="col-span-4 pt-[80px] flex items-center justify-center gap-[40px]">
-                        <Button type="submit" value="Save" className="w-[100px]" />
-                        {isUpdate && (
-                            <Button
-                                type="button"
-                                onClick={handleDelete}
-                                value="Delete"
-                                className="w-[100px] bg-error"
-                            />
-                        )}
+                            {formik.values.profile ? (
+                                <Image
+                                    src={formik.values.profile}
+                                    className="rounded-[100px] object-cover w-[100px] h-[100px]"
+                                    alt="profile"
+                                    width={100}
+                                    height={100}
+                                />
+                            ) : (
+                                <Image src={defaultProfileImg} alt="profile" width={100} height={100} />
+                            )}
+                        </label>
                     </div>
-                )}
-            </form>
-        </>
+                    <Input
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="First Name"
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        value={formik.values.firstName}
+                        onChange={formik.handleChange}
+                        error={formik.errors.firstName}
+                    />
+                    <Input
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="Last Name"
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        value={formik.values.lastName}
+                        onChange={formik.handleChange}
+                        error={formik.errors.lastName}
+                    />
+                    <Select
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="Barangay"
+                        id="barangay"
+                        name="barangay"
+                        value={formik.values.barangay}
+                        error={formik.errors.barangay}
+                        data={barangay || defaultOptionData()}
+                        onSelectItem={(item: SelectPropsData) => {
+                            formik.setFieldValue('barangay', item.value);
+                        }}
+                    />
+                    <Select
+                        disabled={isGuest}
+                        containerClassName="col-span-2 flex flex-col gap-[4px]"
+                        label="Gender"
+                        id="gender"
+                        name="gender"
+                        value={formik.values.gender}
+                        error={formik.errors.gender}
+                        data={genderData()}
+                        onSelectItem={(item: SelectPropsData) => {
+                            formik.setFieldValue('gender', item.value);
+                        }}
+                    />
+                    <Select
+                        disabled={isGuest}
+                        containerClassName="col-span-2 flex flex-col gap-[4px]"
+                        label="Sport"
+                        id="sport"
+                        name="sport"
+                        value={formik.values.sport}
+                        error={formik.errors.sport}
+                        data={sports || defaultOptionData()}
+                        onSelectItem={(item: SelectPropsData) => {
+                            formik.setFieldValue('sport', item.value);
+                        }}
+                    />
+                    <Select
+                        disabled={isGuest}
+                        containerClassName="col-span-2 flex flex-col gap-[4px]"
+                        label="Suffix"
+                        id="suffix"
+                        name="suffix"
+                        value={formik.values.suffix}
+                        error={formik.errors.suffix}
+                        data={suffixData()}
+                        onSelectItem={(item: SelectPropsData) => {
+                            formik.setFieldValue('suffix', item.value);
+                        }}
+                    />
+                    <Input
+                        disabled={isGuest}
+                        containerClassName="col-span-2 flex flex-col gap-[4px]"
+                        label="Age"
+                        id="age"
+                        name="age"
+                        type="text"
+                        value={formik.values.age}
+                        onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+                            const value = evt.target.value;
+                            const numericValue = value.replace(/[^0-9.]/g, '');
+                            formik.setFieldValue('age', numericValue);
+                        }}
+                        error={formik.errors.age}
+                    />
+                    {!isGuest && (
+                        <div className="col-span-4 pt-[80px] flex items-center justify-center gap-[40px]">
+                            <Button type="submit" value="Save" className="w-[100px]" />
+                            {isUpdate && (
+                                <Button
+                                    type="button"
+                                    onClick={handleDelete}
+                                    value="Delete"
+                                    className="w-[100px] bg-error"
+                                />
+                            )}
+                        </div>
+                    )}
+                </form>
+            </section>
+        </Modal>
     );
 };
 

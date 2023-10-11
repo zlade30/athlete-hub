@@ -12,6 +12,7 @@ export const fbAddTeam = async (payload: TeamProps) => {
                 profile: item.profile
             }))
         }
+        delete team.selected;
         const result = await addDoc(collection(db, 'teams'), team);
         return { ...payload, id: result.id }
     } catch (error) {
@@ -50,6 +51,7 @@ export const fbUpdateTeam = async (payload: TeamProps) => {
                 profile: item.profile
             }))
         }
+        delete team.selected;
         await updateDoc(doc(db, 'teams', team.id!), { ...team })
         return team as TeamProps;
     } catch (error) {

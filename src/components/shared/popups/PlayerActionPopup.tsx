@@ -1,17 +1,56 @@
 import React from 'react';
 import { Popup } from '.';
 import { useDispatch } from 'react-redux';
-import { setSelectedPlayer, setShowPlayerModal } from '@/redux/reducers/players';
+import { removePlayer, setSelectedPlayer, setShowPlayerInformation } from '@/redux/reducers/players';
+import { usePathname } from 'next/navigation';
+import { removeCoach, setSelectedCoach, setShowCoachInformation } from '@/redux/reducers/coaches';
+import { removeTeam, setSelectedTeam, setShowTeamInformation } from '@/redux/reducers/teams';
+import { setShowSpinnerDialog } from '@/redux/reducers/app';
+import { fbDeleteTeam } from '@/firebase-api/teams';
+import { fbDeleteCoach } from '@/firebase-api/coaches';
+import { fbDeletePlayer } from '@/firebase-api/player';
 
-const PlayerActionPopup = ({ open, onClose, player }: PopupProps & { player: PlayerProps }) => {
+const PlayerActionPopup = ({
+    open,
+    onClose,
+    person
+}: PopupProps & { person: PlayerProps | CoachProps | TeamProps }) => {
+    const path = usePathname();
     const dispatch = useDispatch();
     const actions = ['Update', 'Delete'];
 
-    const handleSelectedAction = (action: string) => {
-        if (action === 'Update') {
-            dispatch(setShowPlayerModal(true));
-            dispatch(setSelectedPlayer(player));
-        } else {
+    const handleSelectedAction = async (action: string) => {
+        switch (action) {
+            case 'Update':
+                if (path.includes('players')) {
+                    dispatch(setShowPlayerInformation(true));
+                    dispatch(setSelectedPlayer(person as PlayerProps));
+                } else if (path.includes('coaches')) {
+                    dispatch(setShowCoachInformation(true));
+                    dispatch(setSelectedCoach(person as CoachProps));
+                } else if (path.includes('teams')) {
+                    dispatch(setShowTeamInformation(true));
+                    dispatch(setSelectedTeam(person as TeamProps));
+                }
+                break;
+            case 'Delete':
+                if (path.includes('players')) {
+                    dispatch(setShowSpinnerDialog({ open: true, content: 'Removing player...' }));
+                    await fbDeletePlayer(person?.id!);
+                    dispatch(removePlayer(person?.id!));
+                } else if (path.includes('coaches')) {
+                    dispatch(setShowSpinnerDialog({ open: true, content: 'Removing coach...' }));
+                    await fbDeleteCoach(person?.id!);
+                    dispatch(removeCoach(person?.id!));
+                } else if (path.includes('teams')) {
+                    dispatch(setShowSpinnerDialog({ open: true, content: 'Removing team...' }));
+                    await fbDeleteTeam(person?.id!);
+                    dispatch(removeTeam(person?.id!));
+                }
+                dispatch(setShowSpinnerDialog({ open: false, content: '' }));
+                break;
+            default:
+                break;
         }
     };
 
@@ -22,7 +61,7 @@ const PlayerActionPopup = ({ open, onClose, player }: PopupProps & { player: Pla
                     <div
                         key={action}
                         onClick={() => handleSelectedAction(action)}
-                        className="text-[14px] px-[10px] py-[5px] hover:bg-secondary h-[40px] flex items-center cursor-pointer"
+                        className="text-[14px] px-[20px] py-[5px] hover:bg-secondary h-[40px] flex items-center cursor-pointer"
                     >
                         {action}
                     </div>

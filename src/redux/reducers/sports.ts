@@ -3,11 +3,13 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 type InitialStateProps = {
     sports: SportProps[];
     selectedSport: SportProps | undefined;
+    showSportInformation: boolean;
 };
 
 const initialState: InitialStateProps = {
     sports: [],
     selectedSport: undefined,
+    showSportInformation: false
 };
 
 export const slice = createSlice({
@@ -28,6 +30,9 @@ export const slice = createSlice({
         },
         setSelectedSport: (state, action: PayloadAction<SportProps | undefined>) => {
             state.selectedSport = action.payload
+        },
+        setShowSportInformation: (state, action: PayloadAction<boolean>) => {
+            state.showSportInformation = action.payload
         }
     }
 });
@@ -38,6 +43,7 @@ export const {
     removeSport,
     updateSport,
     setSelectedSport,
+    setShowSportInformation
 } = slice.actions;
 
 export default slice.reducer;

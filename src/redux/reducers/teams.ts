@@ -2,16 +2,18 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 type InitialStateProps = {
     teams: TeamProps[];
-    isPlayerSelection: boolean;
     selectedTeam: TeamProps | undefined;
     selectedPlayers: TeamPlayerProps[];
+    showTeamInformation: boolean;
+    showTeamPlayerSelection: boolean;
 };
 
 const initialState: InitialStateProps = {
     teams: [],
     selectedTeam: undefined,
-    isPlayerSelection: false,
-    selectedPlayers: []
+    selectedPlayers: [],
+    showTeamInformation: false,
+    showTeamPlayerSelection: false
 };
 
 export const slice = createSlice({
@@ -33,12 +35,15 @@ export const slice = createSlice({
         setSelectedTeam: (state, action: PayloadAction<TeamProps | undefined>) => {
             state.selectedTeam = action.payload
         },
-        setIsPlayerSelection: (state, action: PayloadAction<boolean>) => {
-            state.isPlayerSelection = action.payload
+        setShowTeamPlayerSelection: (state, action: PayloadAction<boolean>) => {
+            state.showTeamPlayerSelection = action.payload
         },
         setSelectedPlayers: (state, action: PayloadAction<TeamPlayerProps[]>) => {
             state.selectedPlayers = action.payload
-        }
+        },
+        setShowTeamInformation: (state, action: PayloadAction<boolean>) => {
+            state.showTeamInformation = action.payload
+        },
     }
 });
 
@@ -49,7 +54,8 @@ export const {
     removeTeam,
     setSelectedTeam,
     setSelectedPlayers,
-    setIsPlayerSelection
+    setShowTeamInformation,
+    setShowTeamPlayerSelection
 } = slice.actions;
 
 export default slice.reducer;

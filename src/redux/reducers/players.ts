@@ -3,11 +3,13 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 type InitialStateProps = {
     players: PlayerProps[];
     selectedPlayer: PlayerProps | undefined;
+    showPlayerInformation: boolean;
 };
 
 const initialState: InitialStateProps = {
     players: [],
     selectedPlayer: undefined,
+    showPlayerInformation: false,
 };
 
 export const slice = createSlice({
@@ -28,6 +30,9 @@ export const slice = createSlice({
         },
         setSelectedPlayer: (state, action: PayloadAction<PlayerProps | undefined>) => {
             state.selectedPlayer = action.payload
+        },
+        setShowPlayerInformation: (state, action: PayloadAction<boolean>) => {
+            state.showPlayerInformation = action.payload
         }
     }
 });
@@ -38,6 +43,7 @@ export const {
     createPlayer,
     removePlayer,
     setSelectedPlayer,
+    setShowPlayerInformation
 } = slice.actions;
 
 export default slice.reducer;
