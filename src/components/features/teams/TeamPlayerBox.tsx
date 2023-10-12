@@ -6,7 +6,7 @@ import Image from 'next/image';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
-const TeamPlayerBox = ({ player }: { player: TeamPlayerProps }) => {
+const TeamPlayerBox = ({ isGuest, player }: { isGuest: boolean; player: TeamPlayerProps }) => {
     const dispatch = useDispatch();
     const { selectedPlayers } = useAppSelector((state) => state.teams);
 
@@ -20,9 +20,11 @@ const TeamPlayerBox = ({ player }: { player: TeamPlayerProps }) => {
             className="border border-primary rounded-[8px] flex flex-col items-center text-[14px] py-[10px]"
             key={player.id}
         >
-            <div className="w-full flex items-center justify-end pr-[12px]">
-                <CancelIcon onClick={handleRemovePlayer} className="w-[14px] h-[14px] cursor-pointer" />
-            </div>
+            {!isGuest && (
+                <div className="w-full flex items-center justify-end pr-[12px]">
+                    <CancelIcon onClick={handleRemovePlayer} className="w-[14px] h-[14px] cursor-pointer" />
+                </div>
+            )}
             <div className="w-[80px] h-[80px] rounded-[80px] relative mb-[10px]">
                 <Image
                     fill

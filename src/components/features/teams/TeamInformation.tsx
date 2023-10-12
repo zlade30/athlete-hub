@@ -254,16 +254,18 @@ const TeamInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>) =>
                     />
                     <div className="col-span-4 grid grid-cols-2 gap-[10px]">
                         {players?.map((player) => (
-                            <TeamPlayerBox key={player.id} player={player} />
+                            <TeamPlayerBox isGuest={isGuest} key={player.id} player={player} />
                         ))}
-                        <div className="col-span-2 flex items-center justify-center">
-                            <Button
-                                type="button"
-                                onClick={handleSelectPlayers}
-                                value="Select Players"
-                                className="w-[140px] bg-transparent text-primary hover:bg-secondary"
-                            />
-                        </div>
+                        {!isGuest && (
+                            <div className="col-span-2 flex items-center justify-center">
+                                <Button
+                                    type="button"
+                                    onClick={handleSelectPlayers}
+                                    value="Select Players"
+                                    className="w-[140px] bg-transparent text-primary hover:bg-secondary"
+                                />
+                            </div>
+                        )}
                     </div>
                     {!players?.length && isSubmit && (
                         <span className="text-error text-[14px] col-span-4 text-center">

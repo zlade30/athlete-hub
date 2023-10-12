@@ -179,7 +179,7 @@ const CoachesList = () => {
                 <FallbackEmpty icon={<UserIcon className="w-[50px] h-[50px]" />} content="List is currently empty." />
             )}
             {!showSpinnerFallback.show && (
-                <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto">
+                <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto overflow-auto">
                     {coachList.map((person) => (
                         <PersonBox key={person.id} person={person} />
                     ))}

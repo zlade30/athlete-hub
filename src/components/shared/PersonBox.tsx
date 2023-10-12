@@ -2,20 +2,21 @@
 
 import Image from 'next/image';
 import { defaultProfileImg } from '@/public/images';
-import { MenuIcon } from '@/public/icons';
+import { MenuIcon, ShowIcon } from '@/public/icons';
 import { PlayerActionPopup } from './popups';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
-import { setPlayers } from '@/redux/reducers/players';
+import { setPlayers, setSelectedPlayer, setShowPlayerInformation } from '@/redux/reducers/players';
 import { usePathname } from 'next/navigation';
-import { setCoaches } from '@/redux/reducers/coaches';
+import { setCoaches, setSelectedCoach, setShowCoachInformation } from '@/redux/reducers/coaches';
 
 const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
     const path = usePathname();
     const dispatch = useDispatch();
     const { players } = useAppSelector((state) => state.player);
     const { coaches } = useAppSelector((state) => state.coaches);
+    const [isGuest, setIsGuest] = useState(false);
 
     const handleAction = (action: 'show' | 'hide') => {
         if (action === 'show') {
@@ -45,15 +46,35 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
         }
     };
 
+    const handleView = () => {
+        if (path.includes('players')) {
+            dispatch(setShowPlayerInformation(true));
+            dispatch(setSelectedPlayer(person as PlayerProps));
+        } else if (path.includes('coaches')) {
+            dispatch(setShowCoachInformation(true));
+            dispatch(setSelectedCoach(person as CoachProps));
+        }
+    };
+
+    useEffect(() => {
+        setIsGuest(localStorage.getItem('id') === 'guest');
+    }, []);
+
     return (
         <div className="bg-white group w-[200px] h-[200px] rounded-[8px] flex flex-col items-center p-[20px] relative">
-            <div className="absolute right-0 top-0">
-                <MenuIcon
-                    onClick={() => handleAction('show')}
-                    className="w-[18px] h-[18px] mr-[12px] mt-[12px] cursor-pointer"
-                />
-                <PlayerActionPopup open={person.selected!} onClose={() => handleAction('hide')} person={person} />
-            </div>
+            {!isGuest ? (
+                <div className="absolute right-0 top-0">
+                    <MenuIcon
+                        onClick={() => handleAction('show')}
+                        className="w-[18px] h-[18px] mr-[12px] mt-[12px] cursor-pointer"
+                    />
+                    <PlayerActionPopup open={person.selected!} onClose={() => handleAction('hide')} person={person} />
+                </div>
+            ) : (
+                <div className="absolute right-0 top-0">
+                    <ShowIcon onClick={handleView} className="w-[24px] h-[24px] mr-[12px] mt-[12px] cursor-pointer" />
+                </div>
+            )}
             <div className="w-[80px] h-[80px] rounded-[80px] relative mb-[10px]">
                 <Image
                     className="rounded-[80px] object-cover"

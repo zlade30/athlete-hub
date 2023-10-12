@@ -149,14 +149,18 @@ const SportsList = () => {
                                         align="right"
                                         className="h-[50px] flex items-center justify-end gap-[20px] pr-[20px]"
                                     >
-                                        <EditIcon
-                                            onClick={() => handleSelectedSport(item)}
-                                            className="w-[14px] h-[14px] cursor-pointer"
-                                        />
-                                        <DeleteIcon
-                                            onClick={() => handleDelete(item)}
-                                            className="w-[14px] h-[14px] cursor-pointer"
-                                        />
+                                        {!isGuest && (
+                                            <>
+                                                <EditIcon
+                                                    onClick={() => handleSelectedSport(item)}
+                                                    className="w-[14px] h-[14px] cursor-pointer"
+                                                />
+                                                <DeleteIcon
+                                                    onClick={() => handleDelete(item)}
+                                                    className="w-[14px] h-[14px] cursor-pointer"
+                                                />
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

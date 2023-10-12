@@ -17,6 +17,7 @@ const Page = () => {
     useEffect(() => {
         const id = localStorage.getItem('id');
         if (!id) redirect('sign-in');
+        if (path === '/') redirect('/players');
     }, []);
 
     if (isPlayerPage) return <PlayersList />;

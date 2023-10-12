@@ -149,7 +149,7 @@ const TeamsList = () => {
                 />
             )}
             {!showSpinnerFallback.show && (
-                <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto">
+                <div className="px-[20px] flex flex-wrap gap-[34.5px] columns-auto overflow-auto">
                     {teamList.map((team) => (
                         <TeamBox key={team.id} team={team} />
                     ))}

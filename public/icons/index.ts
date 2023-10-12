@@ -3,6 +3,7 @@ export { default as UserIcon } from './user.svg';
 export { default as MenuIcon } from './menu.svg';
 export { default as PlusIcon } from './plus.svg';
 export { default as EditIcon } from './edit.svg';
+export { default as ShowIcon } from './show.svg';
 export { default as ChessIcon } from './chess.svg';
 export { default as PrintIcon } from './print.svg';
 export { default as ExportIcon } from './export.svg';

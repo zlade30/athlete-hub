@@ -123,7 +123,7 @@ const PlayersList = () => {
     }, []);
 
     return (
-        <div className="w-full h-full flex flex-col overflow-y-auto relative">
+        <div className="w-full h-full flex flex-col relative">
             <PlayersInformation
                 open={showPlayerInformation}
                 handleClose={() => dispatch(setShowPlayerInformation(false))}
@@ -179,7 +179,7 @@ const PlayersList = () => {
                 <FallbackEmpty icon={<UserIcon className="w-[50px] h-[50px]" />} content="List is currently empty." />
             )}
             {!showSpinnerFallback.show && (
-                <div className="px-[20px] flex flex-wrap gap-[26px] columns-auto">
+                <div className="px-[20px] flex flex-wrap gap-[26px] columns-auto overflow-auto">
                     {playerList.map((player) => (
                         <PersonBox key={player.id} person={player} />
                     ))}
