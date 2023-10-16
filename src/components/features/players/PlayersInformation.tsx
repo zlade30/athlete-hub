@@ -46,7 +46,6 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
         height: yup.string().notRequired(),
         age: yup.string().required('* required field'),
         weight: yup.string().notRequired(),
-        achievements: yup.array().notRequired(),
         videos: yup.array().notRequired(),
         dateJoined: yup.string().notRequired()
     });
@@ -64,7 +63,6 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
             age: '',
             weight: '',
             dateJoined: '',
-            achievements: 0,
             videos: [],
             dateAdded: 0,
             dateUpdated: 0
@@ -91,7 +89,6 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                     profile = await getDownloadURL(uploadTask.ref);
                 }
                 if (isUpdate) {
-                    console.log(values);
                     result = await fbUpdatePlayer({
                         ...values,
                         profile: profile || values.profile,
@@ -165,6 +162,10 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
         }
         setSelectedPhoto(undefined);
     }, [selectedPlayer]);
+
+    useEffect(() => {
+        console.log(formik.values);
+    }, [formik]);
 
     return (
         <Modal open={open} handleClose={onClose}>

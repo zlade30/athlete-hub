@@ -73,7 +73,7 @@ declare global {
         weight: string;
         gender: string;
         age: string;
-        achievements: number | any;
+        achievements?: number | any;
         dateJoined: string;
         videos: Array;
         dateAdded?: number;
@@ -94,7 +94,7 @@ declare global {
         profile: string;
         sport: string;
         coach: string;
-        achievements: number | any;
+        achievements?: number | any;
         players: TeamPlayerProps[];
         dateAdded?: number;
         dateUpdated?: number;
