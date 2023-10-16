@@ -7,6 +7,13 @@ declare global {
      * Now declare things that go in the global namespace,
      * or augment existing declarations in the global namespace.
      */
+    type AchievementProps = {
+        id?: string;
+        name: string;
+        url: string;
+        dateAdded?: number;
+    }
+
     type SignProps = {
         email: string;
         password: string;

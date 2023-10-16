@@ -1,7 +1,12 @@
 import React from 'react';
 import { Popup } from '.';
 import { useDispatch } from 'react-redux';
-import { removePlayer, setSelectedPlayer, setShowPlayerInformation } from '@/redux/reducers/players';
+import {
+    removePlayer,
+    setSelectedPlayer,
+    setShowPlayerAchievements,
+    setShowPlayerInformation
+} from '@/redux/reducers/players';
 import { usePathname } from 'next/navigation';
 import { removeCoach, setSelectedCoach, setShowCoachInformation } from '@/redux/reducers/coaches';
 import { removeTeam, setSelectedTeam, setShowTeamInformation } from '@/redux/reducers/teams';
@@ -17,7 +22,7 @@ const PlayerActionPopup = ({
 }: PopupProps & { person: PlayerProps | CoachProps | TeamProps }) => {
     const path = usePathname();
     const dispatch = useDispatch();
-    const actions = ['Update', 'Delete'];
+    const actions = ['Update', 'Achievements', 'Delete'];
 
     const handleSelectedAction = async (action: string) => {
         switch (action) {
@@ -48,6 +53,10 @@ const PlayerActionPopup = ({
                     dispatch(removeTeam(person?.id!));
                 }
                 dispatch(setShowSpinnerDialog({ open: false, content: '' }));
+                break;
+            case 'Achievements':
+                dispatch(setShowPlayerAchievements(true));
+                dispatch(setSelectedPlayer(person as PlayerProps));
                 break;
             default:
                 break;
