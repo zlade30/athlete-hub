@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { defaultProfileImg } from '@/public/images';
-import { MenuIcon, ShowIcon } from '@/public/icons';
+import { MenuIcon, ShowIcon, TrophyIcon } from '@/public/icons';
 import { PlayerActionPopup } from './popups';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -62,6 +62,12 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
 
     return (
         <div className="bg-white group w-[200px] h-[200px] rounded-[8px] flex flex-col items-center p-[20px] relative">
+            {path.includes('players') && (
+                <div className="absolute left-0 top-0 mt-[8px] ml-[12px] flex items-center gap-[4px]">
+                    <p className="text-[14px]">{person.achievements}</p>
+                    <TrophyIcon onClick={handleView} className="w-[24px] h-[24px] mr-[12px]cursor-pointer" />
+                </div>
+            )}
             {!isGuest ? (
                 <div className="absolute right-0 top-0">
                     <MenuIcon

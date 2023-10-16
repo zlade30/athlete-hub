@@ -15,18 +15,21 @@ import { fbGetTeams } from '@/firebase-api/teams';
 import {
     setSelectedPlayers,
     setSelectedTeam,
+    setShowTeamAchievements,
     setShowTeamInformation,
     setShowTeamPlayerSelection,
     setTeams
 } from '@/redux/reducers/teams';
 import TeamBox from '@/components/shared/TeamBox';
-import { TeamInformation, TeamPlayersSelection, TeamReport } from '.';
+import { TeamAchievements, TeamInformation, TeamPlayersSelection, TeamReport } from '.';
 
 const TeamsList = () => {
     const playersReportRef = useRef();
     const dispatch = useDispatch();
     const { showSpinnerFallback } = useAppSelector((state) => state.app);
-    const { teams, showTeamInformation, showTeamPlayerSelection } = useAppSelector((state) => state.teams);
+    const { teams, showTeamInformation, showTeamPlayerSelection, showTeamAchievements } = useAppSelector(
+        (state) => state.teams
+    );
     const { selectedBarangay } = useAppSelector((state) => state.barangay);
     const [teamList, setTeamList] = useState<TeamProps[]>([]);
     const [sportList, setSportList] = useState<SportsProps[]>([]);
@@ -110,6 +113,10 @@ const TeamsList = () => {
             <TeamPlayersSelection
                 open={showTeamPlayerSelection}
                 handleClose={() => dispatch(setShowTeamPlayerSelection(false))}
+            />
+            <TeamAchievements
+                open={showTeamAchievements}
+                handleClose={() => dispatch(setShowTeamAchievements(false))}
             />
             <SpinnerDialog />
             <TeamReport ref={playersReportRef} teamList={teamList} />

@@ -47,6 +47,7 @@ declare global {
 
     type CoachProps = {
         id?: string;
+        achievements?: number;
         profile: string;
         lastName: string;
         firstName: string;
@@ -72,7 +73,8 @@ declare global {
         weight: string;
         gender: string;
         age: string;
-        achivements: Array;
+        achievements: number;
+        dateJoined: string;
         videos: Array;
         dateAdded?: number;
         dateUpdated?: number;
@@ -92,6 +94,7 @@ declare global {
         profile: string;
         sport: string;
         coach: string;
+        achievements: number;
         players: TeamPlayerProps[];
         dateAdded?: number;
         dateUpdated?: number;

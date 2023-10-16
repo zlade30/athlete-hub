@@ -11,6 +11,7 @@ export { default as CancelIcon } from './cancel.svg';
 export { default as DeleteIcon } from './delete.svg';
 export { default as UploadIcon } from './upload.svg';
 export { default as ChevronIcon } from './chevron.svg';
+export { default as TrophyIcon } from './trophy.svg';
 export { default as UserGroupIcon } from './user-group.svg';
 export { default as VolleyballIcon } from './volleyball.svg';
 export { default as BasketballIcon } from './basketball.svg';

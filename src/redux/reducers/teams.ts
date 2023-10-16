@@ -6,6 +6,8 @@ type InitialStateProps = {
     selectedPlayers: TeamPlayerProps[];
     showTeamInformation: boolean;
     showTeamPlayerSelection: boolean;
+    achievements: AchievementProps[];
+    showTeamAchievements: boolean;
 };
 
 const initialState: InitialStateProps = {
@@ -13,7 +15,9 @@ const initialState: InitialStateProps = {
     selectedTeam: undefined,
     selectedPlayers: [],
     showTeamInformation: false,
-    showTeamPlayerSelection: false
+    showTeamPlayerSelection: false,
+    achievements: [],
+    showTeamAchievements: false
 };
 
 export const slice = createSlice({
@@ -44,6 +48,21 @@ export const slice = createSlice({
         setShowTeamInformation: (state, action: PayloadAction<boolean>) => {
             state.showTeamInformation = action.payload
         },
+        createAchievement: (state, action: PayloadAction<AchievementProps>) => {
+            state.achievements = [action.payload, ...state.achievements]
+        },
+        removeAchievement: (state, action: PayloadAction<string>) => {
+            state.achievements = state.achievements.filter((item) => item.id !== action.payload);
+        },
+        updateAchievement: (state, action: PayloadAction<AchievementProps>) => {
+            state.achievements = state.achievements.map((item) => item.id === action.payload.id ? { ...action.payload } : item)
+        },
+        setShowTeamAchievements: (state, action: PayloadAction<boolean>) => {
+            state.showTeamAchievements = action.payload
+        },
+        setAchievements: (state, action: PayloadAction<AchievementProps[]>) => {
+            state.achievements = action.payload
+        }
     }
 });
 
@@ -55,7 +74,12 @@ export const {
     setSelectedTeam,
     setSelectedPlayers,
     setShowTeamInformation,
-    setShowTeamPlayerSelection
+    setShowTeamPlayerSelection,
+    createAchievement,
+    removeAchievement,
+    setShowTeamAchievements,
+    updateAchievement,
+    setAchievements
 } = slice.actions;
 
 export default slice.reducer;

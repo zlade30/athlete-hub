@@ -18,16 +18,16 @@ import {
 } from '@/redux/reducers/sports';
 import { Modal } from '@/components/shared';
 import { CancelIcon } from '@/public/icons';
-import { fbAddPlayerAchievement, fbUpdatePlayer } from '@/firebase-api/player';
 import { storage } from '@/firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import Image from 'next/image';
-import { createAchievement, updatePlayer } from '@/redux/reducers/players';
 import { increment } from 'firebase/firestore';
+import { fbAddTeamAchievement, fbUpdateTeam } from '@/firebase-api/teams';
+import { createAchievement, updateTeam } from '@/redux/reducers/teams';
 
-const PlayersAchievementsModal = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
+const TeamAchievementsModal = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
-    const { selectedPlayer } = useAppSelector((state) => state.player);
+    const { selectedTeam } = useAppSelector((state) => state.teams);
     const [selectedPhoto, setSelectedPhoto] = useState('');
     const [selectedAchievement, setSelectedAchievement] = useState<File>();
 
@@ -53,7 +53,7 @@ const PlayersAchievementsModal = ({ open, handleClose }: Omit<ModalProps, 'child
                     handleClose();
                     const storageRef = ref(
                         storage,
-                        `/achievements/${selectedPlayer?.id}-${selectedPlayer?.lastName}/${values.name}.jpg`
+                        `/achievements/${selectedTeam?.id}-${selectedTeam?.name}/${values.name}.jpg`
                     );
                     const uploadTask = await uploadBytes(storageRef, selectedAchievement, {
                         contentType: 'image/jpg'
@@ -64,12 +64,12 @@ const PlayersAchievementsModal = ({ open, handleClose }: Omit<ModalProps, 'child
                         url,
                         dateAdded: new Date().getTime()
                     };
-                    const result = await fbAddPlayerAchievement(selectedPlayer?.id!, payload);
-                    const updateResult = await fbUpdatePlayer({
-                        ...selectedPlayer,
-                        achievements: selectedPlayer?.achievements! || 0 + 1
-                    } as PlayerProps);
-                    dispatch(updatePlayer(updateResult));
+                    const result = await fbAddTeamAchievement(selectedTeam?.id!, payload);
+                    const updateResult = await fbUpdateTeam({
+                        ...selectedTeam,
+                        achievements: selectedTeam?.achievements! || 0 + 1
+                    } as TeamProps);
+                    dispatch(updateTeam(updateResult));
                     dispatch(createAchievement(result));
                     dispatch(setShowSpinnerDialog({ open: false, content: '' }));
                 }
@@ -138,4 +138,4 @@ const PlayersAchievementsModal = ({ open, handleClose }: Omit<ModalProps, 'child
     );
 };
 
-export default PlayersAchievementsModal;
+export default TeamAchievementsModal;

@@ -1,30 +1,30 @@
 import { Modal } from '@/components/shared';
 import { Button } from '@/components/shared/buttons';
 import { DeleteIcon, PlusIcon, ShowIcon } from '@/public/icons';
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { PlayersAchievementsModal } from '.';
+import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/redux/store';
-import { fbDeletePlayerAchievement, fbGetPlayersAchievements } from '@/firebase-api/player';
 import { useDispatch } from 'react-redux';
-import { removeAchievement, setAchievements } from '@/redux/reducers/players';
 import { setShowSpinnerDialog } from '@/redux/reducers/app';
+import { TeamAchievementsModal } from '.';
+import { fbDeleteTeamAchievement, fbGetTeamAchievements, fbUpdateTeam } from '@/firebase-api/teams';
+import { removeAchievement, setAchievements, updateTeam } from '@/redux/reducers/teams';
 
-const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
+const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
     const [showModal, setShowModal] = useState(false);
-    const { achievements, selectedPlayer, showPlayerAchievements } = useAppSelector((state) => state.player);
+    const { achievements, selectedTeam, showTeamAchievements } = useAppSelector((state) => state.teams);
 
-    const getPlayerAchievements = async () => {
-        const result = await fbGetPlayersAchievements(selectedPlayer?.id!);
+    const getTeamAchievements = async () => {
+        const result = await fbGetTeamAchievements(selectedTeam?.id!);
         const sort = result.sort((a, b) => b.dateAdded! - a.dateAdded!);
         dispatch(setAchievements(sort));
     };
 
     useEffect(() => {
-        if (showPlayerAchievements) {
-            getPlayerAchievements();
+        if (showTeamAchievements) {
+            getTeamAchievements();
         }
-    }, [showPlayerAchievements]);
+    }, [showTeamAchievements]);
 
     return (
         <Modal open={open} handleClose={handleClose}>
@@ -32,7 +32,7 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
                 style={{ height: 'calc(100vh - 200px)' }}
                 className="w-[800px] bg-white rounded-[8px] px-[20px] flex flex-col items-center justify-between"
             >
-                <PlayersAchievementsModal open={showModal} handleClose={() => setShowModal(false)} />
+                <TeamAchievementsModal open={showModal} handleClose={() => setShowModal(false)} />
                 <header className="w-full py-[20px] border-b flex items-center justify-between">
                     <div />
                     <h1 className="text-center font-bold text-[20px]">Achievements</h1>
@@ -56,7 +56,14 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
                                                     content: 'Removing an achievement...'
                                                 })
                                             );
-                                            await fbDeletePlayerAchievement(selectedPlayer?.id!, item.id!);
+                                            await fbDeleteTeamAchievement(selectedTeam?.id!, item.id!);
+                                            if (selectedTeam?.achievements && selectedTeam?.achievements > 0) {
+                                                const updateResult = await fbUpdateTeam({
+                                                    ...selectedTeam,
+                                                    achievements: selectedTeam?.achievements! || 0 - 1
+                                                } as TeamProps);
+                                                dispatch(updateTeam(updateResult));
+                                            }
                                             dispatch(removeAchievement(item.id!));
                                             dispatch(setShowSpinnerDialog({ open: false, content: '' }));
                                         }}
@@ -79,4 +86,4 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
     );
 };
 
-export default PlayersAchievements;
+export default TeamAchievements;

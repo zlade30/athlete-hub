@@ -9,7 +9,7 @@ import {
 } from '@/redux/reducers/players';
 import { usePathname } from 'next/navigation';
 import { removeCoach, setSelectedCoach, setShowCoachInformation } from '@/redux/reducers/coaches';
-import { removeTeam, setSelectedTeam, setShowTeamInformation } from '@/redux/reducers/teams';
+import { removeTeam, setSelectedTeam, setShowTeamAchievements, setShowTeamInformation } from '@/redux/reducers/teams';
 import { setShowSpinnerDialog } from '@/redux/reducers/app';
 import { fbDeleteTeam } from '@/firebase-api/teams';
 import { fbDeleteCoach } from '@/firebase-api/coaches';
@@ -22,7 +22,10 @@ const PlayerActionPopup = ({
 }: PopupProps & { person: PlayerProps | CoachProps | TeamProps }) => {
     const path = usePathname();
     const dispatch = useDispatch();
-    const actions = ['Update', 'Achievements', 'Delete'];
+    const actions =
+        path.includes('players') || path.includes('teams')
+            ? ['Update', 'Achievements', 'Delete']
+            : ['Update', 'Delete'];
 
     const handleSelectedAction = async (action: string) => {
         switch (action) {
@@ -55,8 +58,13 @@ const PlayerActionPopup = ({
                 dispatch(setShowSpinnerDialog({ open: false, content: '' }));
                 break;
             case 'Achievements':
-                dispatch(setShowPlayerAchievements(true));
-                dispatch(setSelectedPlayer(person as PlayerProps));
+                if (path.includes('players')) {
+                    dispatch(setShowPlayerAchievements(true));
+                    dispatch(setSelectedPlayer(person as PlayerProps));
+                } else {
+                    dispatch(setShowTeamAchievements(true));
+                    dispatch(setSelectedTeam(person as TeamProps));
+                }
                 break;
             default:
                 break;

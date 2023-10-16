@@ -58,3 +58,32 @@ export const fbUpdateTeam = async (payload: TeamProps) => {
         throw new Error(`An error occurred while updating a team: ${error}`);
     }
 }
+
+export const fbAddTeamAchievement = async (teamId: string, payload: AchievementProps) => {
+    try {
+        const result = await addDoc(collection(db, 'teams', teamId, 'achievements'), payload);
+        return { ...payload, id: result.id }
+    } catch (error) {
+        throw new Error(`An error occurred while adding an achievement: ${error}`);
+    }
+}
+
+export const fbGetTeamAchievements = async (teamId: string) => {
+    try {
+        const result = await getDocs(collection(db, 'teams', teamId, 'achievements'));
+        const resultDocs = result.docs.map((item) => ({ id: item.id, ...item.data() as AchievementProps }));
+        const teams = resultDocs.sort((a, b) => b.dateAdded! - a.dateAdded!);
+        return teams;
+    } catch (error) {
+        throw new Error(`An error occurred while fetching the list of achievements: ${error}`);
+    }
+}
+
+export const fbDeleteTeamAchievement = async (teamId: string, achievementId: string) => {
+    try {
+        await deleteDoc(doc(db, 'teams', teamId, 'achievements', achievementId));
+        return 'Achievement deleted successfully.';
+    } catch (error) {
+        throw new Error(`An error occurred while deleting an achievement: ${error}`);
+    }
+}

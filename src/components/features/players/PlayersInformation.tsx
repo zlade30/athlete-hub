@@ -47,7 +47,8 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
         age: yup.string().required('* required field'),
         weight: yup.string().notRequired(),
         achievements: yup.array().notRequired(),
-        videos: yup.array().notRequired()
+        videos: yup.array().notRequired(),
+        dateJoined: yup.string().notRequired()
     });
 
     const formik = useFormik({
@@ -62,7 +63,8 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
             gender: '',
             age: '',
             weight: '',
-            achivements: [],
+            dateJoined: '',
+            achievements: 0,
             videos: [],
             dateAdded: 0,
             dateUpdated: 0
@@ -89,6 +91,7 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                     profile = await getDownloadURL(uploadTask.ref);
                 }
                 if (isUpdate) {
+                    console.log(values);
                     result = await fbUpdatePlayer({
                         ...values,
                         profile: profile || values.profile,
@@ -155,6 +158,7 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
 
     useEffect(() => {
         if (isUpdate) {
+            console.log(selectedPlayer);
             formik.setValues(selectedPlayer);
         } else {
             formik.resetForm();
@@ -322,6 +326,18 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                             formik.setFieldValue('weight', numericValue);
                         }}
                         error={formik.errors.weight}
+                    />
+                    <Input
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="Date Joined"
+                        id="dateJoined"
+                        name="dateJoined"
+                        type="date"
+                        className="normal-case"
+                        value={formik.values.dateJoined}
+                        onChange={formik.handleChange}
+                        error={formik.errors.dateJoined}
                     />
                     {!isGuest && (
                         <div className="col-span-4 pt-[80px] flex items-center justify-center gap-[40px]">
