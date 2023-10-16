@@ -8,6 +8,7 @@ import { setShowSpinnerDialog } from '@/redux/reducers/app';
 import { TeamAchievementsModal } from '.';
 import { fbDeleteTeamAchievement, fbGetTeamAchievements, fbUpdateTeam } from '@/firebase-api/teams';
 import { removeAchievement, setAchievements, updateTeam } from '@/redux/reducers/teams';
+import { increment } from 'firebase/firestore';
 
 const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
@@ -60,7 +61,7 @@ const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) =
                                             if (selectedTeam?.achievements && selectedTeam?.achievements > 0) {
                                                 const updateResult = await fbUpdateTeam({
                                                     ...selectedTeam,
-                                                    achievements: selectedTeam?.achievements! || 0 - 1
+                                                    achievements: increment(-1)
                                                 } as TeamProps);
                                                 dispatch(updateTeam(updateResult));
                                             }
@@ -79,7 +80,7 @@ const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) =
                     </section>
                 )}
                 <footer className="w-full h-[80px] border-t flex items-center justify-center">
-                    <Button className="w-[200px]" value="Close" />
+                    <Button onClick={handleClose} className="w-[200px]" value="Close" />
                 </footer>
             </div>
         </Modal>

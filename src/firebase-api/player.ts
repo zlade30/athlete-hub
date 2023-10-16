@@ -1,5 +1,5 @@
 import { db } from "@/firebase"
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore"
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore"
 
 export const fbAddPlayer = async (payload: PlayerProps) => {
     try {
@@ -35,7 +35,10 @@ export const fbUpdatePlayer = async (player: PlayerProps) => {
     try {
         delete player.selected;
         await updateDoc(doc(db, 'players', player.id!), { ...player })
-        return player as PlayerProps;
+        // Now, retrieve the updated document data
+        const updatedDocRef = doc(db, 'players', player.id!);
+        const updatedDocSnapshot = await getDoc(updatedDocRef);
+        return updatedDocSnapshot.data() as PlayerProps;
     } catch (error) {
         throw new Error(`An error occurred while updating a player: ${error}`);
     }

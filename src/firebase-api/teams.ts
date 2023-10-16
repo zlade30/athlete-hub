@@ -1,5 +1,5 @@
 import { db } from "@/firebase"
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore"
 
 export const fbAddTeam = async (payload: TeamProps) => {
     try {
@@ -53,7 +53,9 @@ export const fbUpdateTeam = async (payload: TeamProps) => {
         }
         delete team.selected;
         await updateDoc(doc(db, 'teams', team.id!), { ...team })
-        return team as TeamProps;
+        const updatedDocRef = doc(db, 'teams', team.id!);
+        const updatedDocSnapshot = await getDoc(updatedDocRef);
+        return updatedDocSnapshot.data() as TeamProps;
     } catch (error) {
         throw new Error(`An error occurred while updating a team: ${error}`);
     }

@@ -4,10 +4,11 @@ import { DeleteIcon, PlusIcon, ShowIcon } from '@/public/icons';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { PlayersAchievementsModal } from '.';
 import { useAppSelector } from '@/redux/store';
-import { fbDeletePlayerAchievement, fbGetPlayersAchievements } from '@/firebase-api/player';
+import { fbDeletePlayerAchievement, fbGetPlayersAchievements, fbUpdatePlayer } from '@/firebase-api/player';
 import { useDispatch } from 'react-redux';
-import { removeAchievement, setAchievements } from '@/redux/reducers/players';
+import { removeAchievement, setAchievements, updatePlayer } from '@/redux/reducers/players';
 import { setShowSpinnerDialog } from '@/redux/reducers/app';
+import { increment } from 'firebase/firestore';
 
 const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
@@ -57,6 +58,13 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
                                                 })
                                             );
                                             await fbDeletePlayerAchievement(selectedPlayer?.id!, item.id!);
+                                            if (selectedPlayer?.achievements && selectedPlayer?.achievements > 0) {
+                                                const updateResult = await fbUpdatePlayer({
+                                                    ...selectedPlayer,
+                                                    achievements: increment(-1)
+                                                } as PlayerProps);
+                                                dispatch(updatePlayer(updateResult));
+                                            }
                                             dispatch(removeAchievement(item.id!));
                                             dispatch(setShowSpinnerDialog({ open: false, content: '' }));
                                         }}
@@ -72,7 +80,7 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
                     </section>
                 )}
                 <footer className="w-full h-[80px] border-t flex items-center justify-center">
-                    <Button className="w-[200px]" value="Close" />
+                    <Button onClick={handleClose} className="w-[200px]" value="Close" />
                 </footer>
             </div>
         </Modal>

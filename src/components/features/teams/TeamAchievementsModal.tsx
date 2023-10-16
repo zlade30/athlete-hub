@@ -67,7 +67,7 @@ const TeamAchievementsModal = ({ open, handleClose }: Omit<ModalProps, 'children
                     const result = await fbAddTeamAchievement(selectedTeam?.id!, payload);
                     const updateResult = await fbUpdateTeam({
                         ...selectedTeam,
-                        achievements: selectedTeam?.achievements! || 0 + 1
+                        achievements: increment(1)
                     } as TeamProps);
                     dispatch(updateTeam(updateResult));
                     dispatch(createAchievement(result));

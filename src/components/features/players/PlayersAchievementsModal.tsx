@@ -67,7 +67,7 @@ const PlayersAchievementsModal = ({ open, handleClose }: Omit<ModalProps, 'child
                     const result = await fbAddPlayerAchievement(selectedPlayer?.id!, payload);
                     const updateResult = await fbUpdatePlayer({
                         ...selectedPlayer,
-                        achievements: selectedPlayer?.achievements! || 0 + 1
+                        achievements: increment(1)
                     } as PlayerProps);
                     dispatch(updatePlayer(updateResult));
                     dispatch(createAchievement(result));

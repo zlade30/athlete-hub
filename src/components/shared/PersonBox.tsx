@@ -62,7 +62,7 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
 
     return (
         <div className="bg-white group w-[200px] h-[200px] rounded-[8px] flex flex-col items-center p-[20px] relative">
-            {path.includes('players') && (
+            {path.includes('players') && person.achievements > 0 && (
                 <div className="absolute left-0 top-0 mt-[8px] ml-[12px] flex items-center gap-[4px]">
                     <p className="text-[14px]">{person.achievements}</p>
                     <TrophyIcon onClick={handleView} className="w-[24px] h-[24px] mr-[12px]cursor-pointer" />
