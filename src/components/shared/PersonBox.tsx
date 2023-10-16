@@ -7,7 +7,12 @@ import { PlayerActionPopup } from './popups';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
-import { setPlayers, setSelectedPlayer, setShowPlayerInformation } from '@/redux/reducers/players';
+import {
+    setPlayers,
+    setSelectedPlayer,
+    setShowPlayerAchievements,
+    setShowPlayerInformation
+} from '@/redux/reducers/players';
 import { usePathname } from 'next/navigation';
 import { setCoaches, setSelectedCoach, setShowCoachInformation } from '@/redux/reducers/coaches';
 
@@ -56,6 +61,11 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
         }
     };
 
+    const handleAchievements = () => {
+        dispatch(setShowPlayerAchievements(true));
+        dispatch(setSelectedPlayer(person as PlayerProps));
+    };
+
     useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
     }, []);
@@ -65,7 +75,7 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
             {path.includes('players') && person.achievements > 0 && (
                 <div className="absolute left-0 top-0 mt-[8px] ml-[12px] flex items-center gap-[4px]">
                     <p className="text-[14px]">{person.achievements}</p>
-                    <TrophyIcon onClick={handleView} className="w-[24px] h-[24px] mr-[12px]cursor-pointer" />
+                    <TrophyIcon onClick={handleAchievements} className="w-[24px] h-[24px] mr-[12px] cursor-pointer" />
                 </div>
             )}
             {!isGuest ? (

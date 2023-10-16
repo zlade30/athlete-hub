@@ -14,6 +14,7 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
     const dispatch = useDispatch();
     const [showModal, setShowModal] = useState(false);
     const { achievements, selectedPlayer, showPlayerAchievements } = useAppSelector((state) => state.player);
+    const [isGuest, setIsGuest] = useState(false);
 
     const getPlayerAchievements = async () => {
         const result = await fbGetPlayersAchievements(selectedPlayer?.id!);
@@ -23,6 +24,7 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
 
     useEffect(() => {
         if (showPlayerAchievements) {
+            setIsGuest(localStorage.getItem('id') === 'guest');
             getPlayerAchievements();
         }
     }, [showPlayerAchievements]);
@@ -37,7 +39,11 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
                 <header className="w-full py-[20px] border-b flex items-center justify-between">
                     <div />
                     <h1 className="text-center font-bold text-[20px]">Achievements</h1>
-                    <PlusIcon onClick={() => setShowModal(true)} className="w-[20px] h-[20px] cursor-pointer" />
+                    {!isGuest ? (
+                        <PlusIcon onClick={() => setShowModal(true)} className="w-[20px] h-[20px] cursor-pointer" />
+                    ) : (
+                        <div />
+                    )}
                 </header>
                 {achievements.length > 0 ? (
                     <section className="w-full flex-1 flex flex-col">
@@ -49,27 +55,29 @@ const PlayersAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>
                                         onClick={() => window.open(item.url, '_blank', 'noreferrer')}
                                         className="w-[28px] h-[28px] cursor-pointer"
                                     />
-                                    <DeleteIcon
-                                        onClick={async () => {
-                                            dispatch(
-                                                setShowSpinnerDialog({
-                                                    open: true,
-                                                    content: 'Removing an achievement...'
-                                                })
-                                            );
-                                            await fbDeletePlayerAchievement(selectedPlayer?.id!, item.id!);
-                                            if (selectedPlayer?.achievements && selectedPlayer?.achievements > 0) {
-                                                const updateResult = await fbUpdatePlayer({
-                                                    ...selectedPlayer,
-                                                    achievements: increment(-1)
-                                                } as PlayerProps);
-                                                dispatch(updatePlayer(updateResult));
-                                            }
-                                            dispatch(removeAchievement(item.id!));
-                                            dispatch(setShowSpinnerDialog({ open: false, content: '' }));
-                                        }}
-                                        className="w-[18px] h-[18px] text-error cursor-pointer"
-                                    />
+                                    {!isGuest && (
+                                        <DeleteIcon
+                                            onClick={async () => {
+                                                dispatch(
+                                                    setShowSpinnerDialog({
+                                                        open: true,
+                                                        content: 'Removing an achievement...'
+                                                    })
+                                                );
+                                                await fbDeletePlayerAchievement(selectedPlayer?.id!, item.id!);
+                                                if (selectedPlayer?.achievements && selectedPlayer?.achievements > 0) {
+                                                    const updateResult = await fbUpdatePlayer({
+                                                        ...selectedPlayer,
+                                                        achievements: increment(-1)
+                                                    } as PlayerProps);
+                                                    dispatch(updatePlayer(updateResult));
+                                                }
+                                                dispatch(removeAchievement(item.id!));
+                                                dispatch(setShowSpinnerDialog({ open: false, content: '' }));
+                                            }}
+                                            className="w-[18px] h-[18px] text-error cursor-pointer"
+                                        />
+                                    )}
                                 </div>
                             </div>
                         ))}

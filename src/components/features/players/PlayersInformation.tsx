@@ -171,7 +171,11 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
         <Modal open={open} handleClose={onClose}>
             <section className="w-[400px] h-full bg-white rounded-[8px]">
                 <header className="flex items-center justify-between p-[20px]">
-                    <p className="text-[18px] font-bold">{isUpdate ? 'Update Player' : 'Add Player'}</p>
+                    {isGuest ? (
+                        <p className="text-[18px] font-bold">Athlete Info</p>
+                    ) : (
+                        <p className="text-[18px] font-bold">{isUpdate ? 'Update Player' : 'Add Player'}</p>
+                    )}
                     <CancelIcon onClick={onClose} className="w-[18px] h-[18px] text-error cursor-pointer" />
                 </header>
                 <form onSubmit={formik.handleSubmit} className="relative w-full grid grid-cols-4 gap-[10px] p-[20px]">

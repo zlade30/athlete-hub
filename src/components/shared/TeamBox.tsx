@@ -5,7 +5,13 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
 import { defaultProfileImg } from '@/public/images';
 import { setCurrentInfo } from '@/redux/reducers/app';
-import { setSelectedPlayers, setSelectedTeam, setShowTeamInformation, setTeams } from '@/redux/reducers/teams';
+import {
+    setSelectedPlayers,
+    setSelectedTeam,
+    setShowTeamAchievements,
+    setShowTeamInformation,
+    setTeams
+} from '@/redux/reducers/teams';
 import { MenuIcon, ShowIcon, TrophyIcon } from '@/public/icons';
 import { PlayerActionPopup } from './popups';
 import { useEffect, useState } from 'react';
@@ -36,6 +42,11 @@ const TeamBox = ({ team }: { team: TeamProps }) => {
         dispatch(setSelectedTeam(team));
     };
 
+    const handleAchievements = () => {
+        dispatch(setShowTeamAchievements(true));
+        dispatch(setSelectedTeam(team as TeamProps));
+    };
+
     useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
     }, []);
@@ -48,7 +59,7 @@ const TeamBox = ({ team }: { team: TeamProps }) => {
             {team.achievements > 0 && (
                 <div className="absolute left-0 top-0 mt-[8px] ml-[12px] flex items-center gap-[4px]">
                     <p className="text-[14px]">{team.achievements}</p>
-                    <TrophyIcon onClick={handleView} className="w-[24px] h-[24px] mr-[12px]cursor-pointer" />
+                    <TrophyIcon onClick={handleAchievements} className="w-[24px] h-[24px] mr-[12px] cursor-pointer" />
                 </div>
             )}
             {!isGuest ? (

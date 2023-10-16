@@ -14,6 +14,7 @@ const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) =
     const dispatch = useDispatch();
     const [showModal, setShowModal] = useState(false);
     const { achievements, selectedTeam, showTeamAchievements } = useAppSelector((state) => state.teams);
+    const [isGuest, setIsGuest] = useState(false);
 
     const getTeamAchievements = async () => {
         const result = await fbGetTeamAchievements(selectedTeam?.id!);
@@ -23,6 +24,7 @@ const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) =
 
     useEffect(() => {
         if (showTeamAchievements) {
+            setIsGuest(localStorage.getItem('id') === 'guest');
             getTeamAchievements();
         }
     }, [showTeamAchievements]);
@@ -37,7 +39,11 @@ const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) =
                 <header className="w-full py-[20px] border-b flex items-center justify-between">
                     <div />
                     <h1 className="text-center font-bold text-[20px]">Achievements</h1>
-                    <PlusIcon onClick={() => setShowModal(true)} className="w-[20px] h-[20px] cursor-pointer" />
+                    {!isGuest ? (
+                        <PlusIcon onClick={() => setShowModal(true)} className="w-[20px] h-[20px] cursor-pointer" />
+                    ) : (
+                        <div />
+                    )}
                 </header>
                 {achievements.length > 0 ? (
                     <section className="w-full flex-1 flex flex-col">
@@ -49,27 +55,29 @@ const TeamAchievements = ({ open, handleClose }: Omit<ModalProps, 'children'>) =
                                         onClick={() => window.open(item.url, '_blank', 'noreferrer')}
                                         className="w-[28px] h-[28px] cursor-pointer"
                                     />
-                                    <DeleteIcon
-                                        onClick={async () => {
-                                            dispatch(
-                                                setShowSpinnerDialog({
-                                                    open: true,
-                                                    content: 'Removing an achievement...'
-                                                })
-                                            );
-                                            await fbDeleteTeamAchievement(selectedTeam?.id!, item.id!);
-                                            if (selectedTeam?.achievements && selectedTeam?.achievements > 0) {
-                                                const updateResult = await fbUpdateTeam({
-                                                    ...selectedTeam,
-                                                    achievements: increment(-1)
-                                                } as TeamProps);
-                                                dispatch(updateTeam(updateResult));
-                                            }
-                                            dispatch(removeAchievement(item.id!));
-                                            dispatch(setShowSpinnerDialog({ open: false, content: '' }));
-                                        }}
-                                        className="w-[18px] h-[18px] text-error cursor-pointer"
-                                    />
+                                    {!isGuest && (
+                                        <DeleteIcon
+                                            onClick={async () => {
+                                                dispatch(
+                                                    setShowSpinnerDialog({
+                                                        open: true,
+                                                        content: 'Removing an achievement...'
+                                                    })
+                                                );
+                                                await fbDeleteTeamAchievement(selectedTeam?.id!, item.id!);
+                                                if (selectedTeam?.achievements && selectedTeam?.achievements > 0) {
+                                                    const updateResult = await fbUpdateTeam({
+                                                        ...selectedTeam,
+                                                        achievements: increment(-1)
+                                                    } as TeamProps);
+                                                    dispatch(updateTeam(updateResult));
+                                                }
+                                                dispatch(removeAchievement(item.id!));
+                                                dispatch(setShowSpinnerDialog({ open: false, content: '' }));
+                                            }}
+                                            className="w-[18px] h-[18px] text-error cursor-pointer"
+                                        />
+                                    )}
                                 </div>
                             </div>
                         ))}

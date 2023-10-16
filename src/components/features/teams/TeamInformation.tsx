@@ -57,6 +57,7 @@ const TeamInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>) =>
             sport: '',
             coach: '',
             players: [],
+            achievements: 0,
             dateAdded: 0,
             dateUpdated: 0
         },
@@ -179,7 +180,11 @@ const TeamInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>) =>
         <Modal open={open} handleClose={onClose}>
             <section className="w-[400px] h-[800px] bg-white rounded-[8px] overflow-y-auto">
                 <header className="flex items-center justify-between p-[20px]">
-                    <p className="text-[18px] font-bold">{isUpdate ? 'Update Team' : 'Add Team'}</p>
+                    {isGuest ? (
+                        <p className="text-[18px] font-bold">Team Info</p>
+                    ) : (
+                        <p className="text-[18px] font-bold">{isUpdate ? 'Update Team' : 'Add Team'}</p>
+                    )}
                     <CancelIcon onClick={onClose} className="w-[18px] h-[18px] text-error cursor-pointer" />
                 </header>
                 <form onSubmit={formik.handleSubmit} className="relative w-full grid grid-cols-4 gap-[10px] p-[20px]">
