@@ -81,6 +81,7 @@ declare global {
         dateUpdated?: number;
         selected?: boolean;
         active?: boolean;
+        birthday: string;
     }
 
     type TeamPlayerProps = {

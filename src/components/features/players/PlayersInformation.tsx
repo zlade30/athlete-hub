@@ -47,7 +47,8 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
         age: yup.string().required('* required field'),
         weight: yup.string().notRequired(),
         videos: yup.array().notRequired(),
-        dateJoined: yup.string().notRequired()
+        dateJoined: yup.string().notRequired(),
+        birthday: yup.string().required('* required field')
     });
 
     const formik = useFormik({
@@ -66,7 +67,8 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
             videos: [],
             dateAdded: 0,
             dateUpdated: 0,
-            active: true
+            active: true,
+            birthday: ''
         },
         validationSchema: schema,
         onSubmit: async (values: PlayerProps) => {
@@ -344,6 +346,18 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                         value={formik.values.dateJoined}
                         onChange={formik.handleChange}
                         error={formik.errors.dateJoined}
+                    />
+                    <Input
+                        disabled={isGuest}
+                        containerClassName="col-span-4 flex flex-col gap-[4px]"
+                        label="Birth Day"
+                        id="birthday"
+                        name="birthday"
+                        type="date"
+                        className="normal-case"
+                        value={formik.values.birthday}
+                        onChange={formik.handleChange}
+                        error={formik.errors.birthday}
                     />
                     {!isGuest && (
                         <span className="flex items-center gap-[10px]">

@@ -96,9 +96,9 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
                 {location.includes('players') && (
                     <>
                         {person.active ? (
-                            <div className="w-[20px] h-[20px] rounded-[20px] bg-red-500 absolute z-10 right-0 bottom-0" />
-                        ) : (
                             <div className="w-[20px] h-[20px] rounded-[20px] bg-green-500 absolute z-10 right-0 bottom-0" />
+                        ) : (
+                            <div className="w-[20px] h-[20px] rounded-[20px] bg-red-500 absolute z-10 right-0 bottom-0" />
                         )}
                     </>
                 )}
