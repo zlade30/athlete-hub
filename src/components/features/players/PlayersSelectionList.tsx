@@ -13,7 +13,7 @@ import { FallbackEmpty, FallbackSpinner } from '@/components/shared/fallbacks';
 import { Select } from '@/components/shared/options';
 import { getSports } from '@/firebase-api/utils';
 import { SpinnerDialog } from '@/components/shared/dialogs';
-import { setIsPlayerSelection, setSelectedPlayers } from '@/redux/reducers/teams';
+import { setShowTeamPlayerSelection, setSelectedPlayers } from '@/redux/reducers/teams';
 
 const PlayersSelectionList = () => {
     const dispatch = useDispatch();
@@ -83,7 +83,7 @@ const PlayersSelectionList = () => {
     };
 
     const handleCancel = () => {
-        dispatch(setIsPlayerSelection(false));
+        dispatch(setShowTeamPlayerSelection(false));
     };
 
     const handleSelectedPerson = (person: PlayerProps | CoachProps) => {
