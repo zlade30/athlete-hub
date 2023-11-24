@@ -55,7 +55,7 @@ const PlayersReport = forwardRef(
                                 <th align="left" className="w-[40px]"></th>
                                 <th align="left">Name</th>
                                 <th align="right">Age</th>
-                                <th align="right">Birth Date</th>
+                                <th align="right">Birthday</th>
                                 <th align="right">Sport</th>
                             </tr>
                         </thead>

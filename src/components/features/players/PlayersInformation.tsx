@@ -67,7 +67,7 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
             videos: [],
             dateAdded: 0,
             dateUpdated: 0,
-            active: true,
+            active: false,
             birthday: ''
         },
         validationSchema: schema,
@@ -350,7 +350,7 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                     <Input
                         disabled={isGuest}
                         containerClassName="col-span-4 flex flex-col gap-[4px]"
-                        label="Birth Day"
+                        label="Birthday"
                         id="birthday"
                         name="birthday"
                         type="date"
