@@ -22,6 +22,7 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
     const { players } = useAppSelector((state) => state.player);
     const { coaches } = useAppSelector((state) => state.coaches);
     const [isGuest, setIsGuest] = useState(false);
+    const location = usePathname();
 
     const handleAction = (action: 'show' | 'hide') => {
         if (action === 'show') {
@@ -87,11 +88,20 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
                     <PlayerActionPopup open={person.selected!} onClose={() => handleAction('hide')} person={person} />
                 </div>
             ) : (
-                <div className="absolute right-0 top-0">
+                <div className="flex items-center absolute right-0 top-0">
                     <ShowIcon onClick={handleView} className="w-[24px] h-[24px] mr-[12px] mt-[12px] cursor-pointer" />
                 </div>
             )}
             <div className="w-[80px] h-[80px] rounded-[80px] relative mb-[10px]">
+                {location.includes('players') && (
+                    <>
+                        {person.active ? (
+                            <div className="w-[20px] h-[20px] rounded-[20px] bg-red-500 absolute z-10 right-0 bottom-0" />
+                        ) : (
+                            <div className="w-[20px] h-[20px] rounded-[20px] bg-green-500 absolute z-10 right-0 bottom-0" />
+                        )}
+                    </>
+                )}
                 <Image
                     className="rounded-[80px] object-cover"
                     src={person.profile || defaultProfileImg}

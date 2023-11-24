@@ -65,7 +65,8 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
             dateJoined: '',
             videos: [],
             dateAdded: 0,
-            dateUpdated: 0
+            dateUpdated: 0,
+            active: true
         },
         validationSchema: schema,
         onSubmit: async (values: PlayerProps) => {
@@ -344,6 +345,16 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                         onChange={formik.handleChange}
                         error={formik.errors.dateJoined}
                     />
+                    {!isGuest && (
+                        <span className="flex items-center gap-[10px]">
+                            <input
+                                type="checkbox"
+                                checked={formik.values.active}
+                                onChange={() => formik.setFieldValue('active', !formik.values.active)}
+                            />
+                            <label>Active</label>
+                        </span>
+                    )}
                     {!isGuest && (
                         <div className="col-span-4 pt-[80px] flex items-center justify-center gap-[40px]">
                             <Button type="submit" value="Save" className="w-[100px]" />
