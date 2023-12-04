@@ -7,6 +7,13 @@ declare global {
      * Now declare things that go in the global namespace,
      * or augment existing declarations in the global namespace.
      */
+    type FileProps = {
+        id?: string;
+        name: string;
+        url: string;
+        dateAdded?: number;
+    }
+
     type AchievementProps = {
         id?: string;
         name: string;
@@ -82,6 +89,7 @@ declare global {
         selected?: boolean;
         active?: boolean;
         birthday: string;
+        files?: number | any;
     }
 
     type TeamPlayerProps = {

@@ -6,11 +6,15 @@ type InitialStateProps = {
     showPlayerInformation: boolean;
     achievements: AchievementProps[];
     showPlayerAchievements: boolean;
+    files: FileProps[];
+    showPlayerFiles: boolean;
 };
 
 const initialState: InitialStateProps = {
+    files: [],
     players: [],
     achievements: [],
+    showPlayerFiles: false,
     selectedPlayer: undefined,
     showPlayerInformation: false,
     showPlayerAchievements: false
@@ -50,9 +54,24 @@ export const slice = createSlice({
         updateAchievement: (state, action: PayloadAction<AchievementProps>) => {
             state.achievements = state.achievements.map((item) => item.id === action.payload.id ? { ...action.payload } : item)
         },
+        setFiles: (state, action: PayloadAction<FileProps[]>) => {
+            state.files = action.payload
+        },
+        createFile: (state, action: PayloadAction<FileProps>) => {
+            state.files = [action.payload, ...state.files]
+        },
+        removeFile: (state, action: PayloadAction<string>) => {
+            state.files = state.files.filter((item) => item.id !== action.payload);
+        },
+        updateFile: (state, action: PayloadAction<FileProps>) => {
+            state.files = state.files.map((item) => item.id === action.payload.id ? { ...action.payload } : item)
+        },
         setShowPlayerAchievements: (state, action: PayloadAction<boolean>) => {
             state.showPlayerAchievements = action.payload
         },
+        setShowPlayerFiles: (state, action: PayloadAction<boolean>) => {
+            state.showPlayerFiles = action.payload
+        }
     }
 });
 
@@ -67,7 +86,12 @@ export const {
     createAchievement,
     removeAchievement,
     updateAchievement,
-    setShowPlayerAchievements
+    setShowPlayerAchievements,
+    createFile,
+    removeFile,
+    updateFile,
+    setShowPlayerFiles,
+    setFiles
 } = slice.actions;
 
 export default slice.reducer;

@@ -5,6 +5,7 @@ import {
     removePlayer,
     setSelectedPlayer,
     setShowPlayerAchievements,
+    setShowPlayerFiles,
     setShowPlayerInformation
 } from '@/redux/reducers/players';
 import { usePathname } from 'next/navigation';
@@ -22,10 +23,18 @@ const PlayerActionPopup = ({
 }: PopupProps & { person: PlayerProps | CoachProps | TeamProps }) => {
     const path = usePathname();
     const dispatch = useDispatch();
-    const actions =
-        path.includes('players') || path.includes('teams')
-            ? ['Update', 'Achievements', 'Delete']
-            : ['Update', 'Delete'];
+
+    const getActions = () => {
+        if (path.includes('players')) {
+            return ['Update', 'Files', 'Achievements', 'Delete'];
+        } else if (path.includes('teams')) {
+            return ['Update', 'Achievements', 'Delete'];
+        } else {
+            return ['Update', 'Delete'];
+        }
+    };
+
+    const actions = getActions();
 
     const handleSelectedAction = async (action: string) => {
         switch (action) {
@@ -64,6 +73,12 @@ const PlayerActionPopup = ({
                 } else {
                     dispatch(setShowTeamAchievements(true));
                     dispatch(setSelectedTeam(person as TeamProps));
+                }
+                break;
+            case 'Files':
+                if (path.includes('players')) {
+                    dispatch(setShowPlayerFiles(true));
+                    dispatch(setSelectedPlayer(person as PlayerProps));
                 }
                 break;
             default:

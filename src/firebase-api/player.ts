@@ -1,5 +1,5 @@
 import { db } from "@/firebase"
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore"
 
 export const fbAddPlayer = async (payload: PlayerProps) => {
     try {
@@ -70,5 +70,34 @@ export const fbDeletePlayerAchievement = async (playerId: string, achievementId:
         return 'Achievement deleted successfully.';
     } catch (error) {
         throw new Error(`An error occurred while deleting an achievement: ${error}`);
+    }
+}
+
+export const fbAddPlayerFiles = async (playerId: string, payload: FileProps) => {
+    try {
+        const result = await addDoc(collection(db, 'players', playerId, 'files'), payload);
+        return { ...payload, id: result.id }
+    } catch (error) {
+        throw new Error(`An error occurred while adding a file: ${error}`);
+    }
+}
+
+export const fbGetPlayerFiles = async (playerId: string) => {
+    try {
+        const result = await getDocs(collection(db, 'players', playerId, 'files'));
+        const resultDocs = result.docs.map((item) => ({ id: item.id, ...item.data() as FileProps }));
+        const players = resultDocs.sort((a, b) => b.dateAdded! - a.dateAdded!);
+        return players;
+    } catch (error) {
+        throw new Error(`An error occurred while fetching the list of files: ${error}`);
+    }
+}
+
+export const fbDeletePlayerFile = async (playerId: string, fileId: string) => {
+    try {
+        await deleteDoc(doc(db, 'players', playerId, 'files', fileId));
+        return 'File deleted successfully.';
+    } catch (error) {
+        throw new Error(`An error occurred while deleting a file: ${error}`);
     }
 }

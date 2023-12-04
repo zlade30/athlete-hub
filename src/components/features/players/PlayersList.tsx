@@ -4,7 +4,12 @@ import { PersonBox } from '@/components/shared';
 import { useAppSelector } from '@/redux/store';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setPlayers, setShowPlayerAchievements, setShowPlayerInformation } from '@/redux/reducers/players';
+import {
+    setPlayers,
+    setShowPlayerAchievements,
+    setShowPlayerFiles,
+    setShowPlayerInformation
+} from '@/redux/reducers/players';
 import { ExportIcon, PlusIcon, PrintIcon, UserIcon } from '@/public/icons';
 import { setShowSpinnerFallback } from '@/redux/reducers/app';
 import { fbGetPlayers } from '@/firebase-api/player';
@@ -17,12 +22,15 @@ import Papa from 'papaparse';
 import ReactToPrint from 'react-to-print';
 import { PlayersAchievements, PlayersInformation, PlayersReport } from '.';
 import { setBarangayList, setSelectedBarangay } from '@/redux/reducers/barangay';
+import PlayersFiles from './PlayersFiles';
 
 const PlayersList = () => {
     const playersReportRef = useRef();
     const dispatch = useDispatch();
     const { showSpinnerFallback } = useAppSelector((state) => state.app);
-    const { players, showPlayerInformation, showPlayerAchievements } = useAppSelector((state) => state.player);
+    const { players, showPlayerInformation, showPlayerAchievements, showPlayerFiles } = useAppSelector(
+        (state) => state.player
+    );
     const { selectedBarangay, barangayList } = useAppSelector((state) => state.barangay);
     const [playerList, setPlayerList] = useState<PlayerProps[]>([]);
     const [sportList, setSportList] = useState<SportsProps[]>([]);
@@ -138,6 +146,7 @@ const PlayersList = () => {
                 open={showPlayerAchievements}
                 handleClose={() => dispatch(setShowPlayerAchievements(false))}
             />
+            <PlayersFiles open={showPlayerFiles} handleClose={() => dispatch(setShowPlayerFiles(false))} />
             <SpinnerDialog />
             <div className="w-full p-[20px] flex items-center justify-between gap-[20px]">
                 <div className="w-full flex items-center gap-[20px]">
