@@ -75,6 +75,7 @@ const Sidebar = () => {
                 <Image fill src={logoImg} alt="logo" className="object-contain p-2" />
             </section>
             <section className="w-full flex flex-col text-[14px]">
+                <NavItem active={isCurrentPage('/highlights')} value="Highlights" handleNavigate={handleNavigate} />
                 <NavItem active={isCurrentPage('/players')} value="Players" handleNavigate={handleNavigate} />
                 <NavItem active={isCurrentPage('/coaches')} value="Coaches" handleNavigate={handleNavigate} />
                 <NavItem active={isCurrentPage('/teams')} value="Teams" handleNavigate={handleNavigate} />

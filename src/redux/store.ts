@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
-import { appReducer, barangayReducer, coachesReducer, playerReducer, sportsReducer, teamsReducer } from './reducers';
+import { appReducer, barangayReducer, coachesReducer, highlightsReducer, playerReducer, sportsReducer, teamsReducer } from './reducers';
 
 export const store = configureStore({
     reducer: {
@@ -9,7 +9,8 @@ export const store = configureStore({
         sports: sportsReducer,
         player: playerReducer,
         coaches: coachesReducer,
-        barangay: barangayReducer
+        barangay: barangayReducer,
+        highlights: highlightsReducer
     }
 });
 

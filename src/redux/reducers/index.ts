@@ -4,3 +4,4 @@ export { default as sportsReducer } from './sports';
 export { default as playerReducer } from './players';
 export { default as coachesReducer } from './coaches';
 export { default as barangayReducer } from './barangay';
+export { default as highlightsReducer } from './highlights';

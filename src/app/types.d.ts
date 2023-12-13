@@ -52,6 +52,14 @@ declare global {
         dateUpdated?: number;
     }
 
+    type HighlightProps = {
+        id?: string;
+        name: string;
+        image: string;
+        dateAdded?: number;
+        dateUpdated?: number;
+    }
+
     type CoachProps = {
         id?: string;
         achievements?: number | any;

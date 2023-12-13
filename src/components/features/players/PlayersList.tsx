@@ -39,6 +39,7 @@ const PlayersList = () => {
     const [searchPlayer, setSearchPlayer] = useState('');
     const [selectedSport, setSelectedSport] = useState('All');
     const [selectedGender, setSelectedGender] = useState('All');
+    const [showAchievements, setShowAchievements] = useState(false);
     const [isGuest, setIsGuest] = useState(false);
 
     const handleKeyFilters = (list: PlayerProps[], key: 'barangay' | 'sport' | 'gender', selectedKey: string) => {
@@ -131,9 +132,26 @@ const PlayersList = () => {
         setSelectedGender(option.value);
     };
 
+    const handleShowAchievements = async () => {
+        try {
+            dispatch(setShowSpinnerFallback({ show: true, content: 'Fetching players...' }));
+            const result = await fbGetPlayers();
+            const list = result.filter((item) => Boolean(item.achievements) === showAchievements);
+            dispatch(setPlayers(list!));
+            dispatch(setShowSpinnerFallback({ show: false, content: '' }));
+        } catch (error) {
+            console.log(error);
+            dispatch(setShowSpinnerFallback({ show: false, content: '' }));
+        }
+    };
+
     useEffect(() => {
         loadPlayers();
     }, [selectedBarangay, selectedSport, selectedGender]);
+
+    useEffect(() => {
+        handleShowAchievements();
+    }, [showAchievements]);
 
     useEffect(() => {
         const list = handleFilters(players);
@@ -167,6 +185,14 @@ const PlayersList = () => {
             <SpinnerDialog />
             <div className="w-full p-[20px] flex items-center justify-between gap-[20px]">
                 <div className="w-full flex items-center gap-[20px]">
+                    <span className="flex items-center gap-[10px] whitespace-nowrap mt-6">
+                        <input
+                            type="checkbox"
+                            checked={showAchievements}
+                            onChange={() => setShowAchievements(!showAchievements)}
+                        />
+                        <label className="text-[14px]">With Achievements</label>
+                    </span>
                     <Select
                         containerClassName="w-[200px] flex flex-col gap-[4px]"
                         label="Sports"
