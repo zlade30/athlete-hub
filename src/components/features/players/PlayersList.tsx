@@ -23,6 +23,7 @@ import ReactToPrint from 'react-to-print';
 import { PlayersAchievements, PlayersInformation, PlayersReport } from '.';
 import { setBarangayList, setSelectedBarangay } from '@/redux/reducers/barangay';
 import PlayersFiles from './PlayersFiles';
+import { generateId } from '@/utils/helpers';
 
 const PlayersList = () => {
     const playersReportRef = useRef();
@@ -34,11 +35,13 @@ const PlayersList = () => {
     const { selectedBarangay, barangayList } = useAppSelector((state) => state.barangay);
     const [playerList, setPlayerList] = useState<PlayerProps[]>([]);
     const [sportList, setSportList] = useState<SportsProps[]>([]);
+    const [genderList, setGenderList] = useState<GenderProps[]>([]);
     const [searchPlayer, setSearchPlayer] = useState('');
     const [selectedSport, setSelectedSport] = useState('All');
+    const [selectedGender, setSelectedGender] = useState('All');
     const [isGuest, setIsGuest] = useState(false);
 
-    const handleKeyFilters = (list: PlayerProps[], key: 'barangay' | 'sport', selectedKey: string) => {
+    const handleKeyFilters = (list: PlayerProps[], key: 'barangay' | 'sport' | 'gender', selectedKey: string) => {
         if (selectedKey === 'All') {
             return list.filter((item: PlayerProps) => item[key] !== 'All');
         } else {
@@ -47,7 +50,8 @@ const PlayersList = () => {
     };
 
     const handleFilters = (list: PlayerProps[]) => {
-        const barangayFilter = handleKeyFilters(list, 'barangay', selectedBarangay);
+        const genderFilter = handleKeyFilters(list, 'gender', selectedGender);
+        const barangayFilter = handleKeyFilters(genderFilter, 'barangay', selectedBarangay);
         const filter = handleKeyFilters(barangayFilter, 'sport', selectedSport);
         return filter;
     };
@@ -96,6 +100,14 @@ const PlayersList = () => {
         } catch (error) {}
     };
 
+    const loadGenders = () => {
+        setGenderList([
+            { id: generateId(10), value: 'All' },
+            { id: generateId(10), value: 'Male' },
+            { id: generateId(10), value: 'Female' }
+        ]);
+    };
+
     const handleSearch = (evt: ChangeEvent<HTMLInputElement>) => {
         const value = evt.target.value;
         const result = players.filter((item) =>
@@ -115,9 +127,13 @@ const PlayersList = () => {
         dispatch(setSelectedBarangay(option.value));
     };
 
+    const handleSelectedGender = (option: SelectPropsData) => {
+        setSelectedGender(option.value);
+    };
+
     useEffect(() => {
         loadPlayers();
-    }, [selectedBarangay, selectedSport]);
+    }, [selectedBarangay, selectedSport, selectedGender]);
 
     useEffect(() => {
         const list = handleFilters(players);
@@ -128,6 +144,7 @@ const PlayersList = () => {
         setIsGuest(localStorage.getItem('id') === 'guest');
         loadSports();
         loadBarangay();
+        loadGenders();
     }, []);
 
     return (
@@ -164,6 +181,13 @@ const PlayersList = () => {
                         data={barangayList! || []}
                         onSelectItem={handleSelectedBarangay}
                     />
+                    <Select
+                        containerClassName="w-[200px] flex flex-col gap-[4px]"
+                        label="Gender"
+                        value={selectedGender}
+                        data={genderList! || []}
+                        onSelectItem={handleSelectedGender}
+                    />
                     <Input
                         containerClassName="w-[300px] flex flex-col gap-[4px]"
                         label="Search Player"
@@ -173,19 +197,19 @@ const PlayersList = () => {
                         onChange={handleSearch}
                     />
                 </div>
-                {!isGuest && (
-                    <div className="w-full flex items-center justify-end gap-[20px]">
-                        <ExportIcon onClick={handleExport} className="w-[30px] h-[30px] cursor-pointer" />
-                        <ReactToPrint
-                            trigger={() => <PrintIcon className="w-[30px] h-[30px] cursor-pointer" />}
-                            content={() => playersReportRef.current!}
-                        />
+                <div className="w-full flex items-center justify-end gap-[20px]">
+                    {!isGuest && <ExportIcon onClick={handleExport} className="w-[30px] h-[30px] cursor-pointer" />}
+                    <ReactToPrint
+                        trigger={() => <PrintIcon className="w-[30px] h-[30px] cursor-pointer" />}
+                        content={() => playersReportRef.current!}
+                    />
+                    {!isGuest && (
                         <PlusIcon
                             onClick={() => dispatch(setShowPlayerInformation(true))}
                             className="w-[20px] h-[20px] cursor-pointer"
                         />
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
             {showSpinnerFallback.show && <FallbackSpinner content="Fetching players..." />}
             {playerList.length === 0 && !showSpinnerFallback.show && (

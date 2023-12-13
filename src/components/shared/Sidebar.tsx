@@ -10,6 +10,7 @@ import { logoImg } from '@/public/images';
 import { useDispatch } from 'react-redux';
 import { setCurrentInfo } from '@/redux/reducers/app';
 import { setSelectedBarangay } from '@/redux/reducers/barangay';
+import { useEffect, useState } from 'react';
 
 type NavItemProps = {
     value: string;
@@ -46,6 +47,7 @@ const Sidebar = () => {
     const dispatch = useDispatch();
     const router = useRouter();
     const path = usePathname();
+    const [isGuest, setIsGuest] = useState(false);
 
     const handleNavigate = (route: string) => {
         dispatch(setSelectedBarangay('All'));
@@ -63,6 +65,10 @@ const Sidebar = () => {
         router.push('/sign-in');
     };
 
+    useEffect(() => {
+        setIsGuest(localStorage.getItem('id') === 'guest');
+    }, []);
+
     return (
         <nav className="w-[300px] h-full bg-white flex flex-col border border-r-gray-200">
             <section className="w-full bg-white h-[200px] relative">
@@ -72,7 +78,9 @@ const Sidebar = () => {
                 <NavItem active={isCurrentPage('/players')} value="Players" handleNavigate={handleNavigate} />
                 <NavItem active={isCurrentPage('/coaches')} value="Coaches" handleNavigate={handleNavigate} />
                 <NavItem active={isCurrentPage('/teams')} value="Teams" handleNavigate={handleNavigate} />
-                <NavItem active={isCurrentPage('/sports')} value="Sports" handleNavigate={handleNavigate} />
+                {!isGuest && (
+                    <NavItem active={isCurrentPage('/sports')} value="Sports" handleNavigate={handleNavigate} />
+                )}
             </section>
             <section className="w-full flex-1 flex items-end justify-center p-[20px]">
                 <Button onClick={handleLogout} value="Logout" className="w-[200px]" />

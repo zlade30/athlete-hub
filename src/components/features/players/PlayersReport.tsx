@@ -55,6 +55,7 @@ const PlayersReport = forwardRef(
                                 <th align="left" className="w-[40px]"></th>
                                 <th align="left">Name</th>
                                 <th align="right">Age</th>
+                                <th align="right">Gender</th>
                                 <th align="right">Birthday</th>
                                 <th align="right">Sport</th>
                             </tr>
@@ -65,6 +66,7 @@ const PlayersReport = forwardRef(
                                     <td>{key + 1}</td>
                                     <td>{`${item.firstName} ${item.lastName}`}</td>
                                     <td align="right">{item.age}</td>
+                                    <td align="right">{item.gender}</td>
                                     <td align="right">{item.birthday}</td>
                                     <td align="right">{item.sport}</td>
                                 </tr>

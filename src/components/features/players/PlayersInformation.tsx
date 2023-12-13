@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import Image from 'next/image';
 import { useFormik } from 'formik';
 import { defaultProfileImg } from '@/public/images';
-import { defaultOptionData, genderData, suffixData } from '@/utils/helpers';
+import { calculateAge, defaultOptionData, genderData, suffixData } from '@/utils/helpers';
 import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import {
@@ -234,19 +234,21 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                         onChange={formik.handleChange}
                         error={formik.errors.lastName}
                     />
-                    <Select
-                        disabled={isGuest}
-                        containerClassName="col-span-4 flex flex-col gap-[4px]"
-                        label="Barangay"
-                        id="barangay"
-                        name="barangay"
-                        value={formik.values.barangay}
-                        error={formik.errors.barangay}
-                        data={barangay || defaultOptionData()}
-                        onSelectItem={(item: SelectPropsData) => {
-                            formik.setFieldValue('barangay', item.value);
-                        }}
-                    />
+                    {!isGuest && (
+                        <Select
+                            disabled={isGuest}
+                            containerClassName="col-span-4 flex flex-col gap-[4px]"
+                            label="Barangay"
+                            id="barangay"
+                            name="barangay"
+                            value={formik.values.barangay}
+                            error={formik.errors.barangay}
+                            data={barangay || defaultOptionData()}
+                            onSelectItem={(item: SelectPropsData) => {
+                                formik.setFieldValue('barangay', item.value);
+                            }}
+                        />
+                    )}
                     <Select
                         disabled={isGuest}
                         containerClassName="col-span-2 flex flex-col gap-[4px]"
@@ -287,13 +289,13 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                         }}
                     />
                     <Input
-                        disabled={isGuest}
+                        disabled
                         containerClassName="col-span-2 flex flex-col gap-[4px]"
                         label="Age"
                         id="age"
                         name="age"
                         type="text"
-                        value={formik.values.age}
+                        value={calculateAge(formik.values.birthday)}
                         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
                             const value = evt.target.value;
                             const numericValue = value.replace(/[^0-9.]/g, '');
@@ -301,6 +303,20 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                         }}
                         error={formik.errors.age}
                     />
+                    {!isGuest && (
+                        <Input
+                            disabled={isGuest}
+                            containerClassName="col-span-4 flex flex-col gap-[4px]"
+                            label="Birthday"
+                            id="birthday"
+                            name="birthday"
+                            type="date"
+                            className="normal-case"
+                            value={formik.values.birthday}
+                            onChange={formik.handleChange}
+                            error={formik.errors.birthday}
+                        />
+                    )}
                     <Input
                         disabled={isGuest}
                         containerClassName="col-span-2 flex flex-col gap-[4px]"
@@ -335,30 +351,20 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
                         }}
                         error={formik.errors.weight}
                     />
-                    <Input
-                        disabled={isGuest}
-                        containerClassName="col-span-4 flex flex-col gap-[4px]"
-                        label="Date Joined"
-                        id="dateJoined"
-                        name="dateJoined"
-                        type="date"
-                        className="normal-case"
-                        value={formik.values.dateJoined}
-                        onChange={formik.handleChange}
-                        error={formik.errors.dateJoined}
-                    />
-                    <Input
-                        disabled={isGuest}
-                        containerClassName="col-span-4 flex flex-col gap-[4px]"
-                        label="Birthday"
-                        id="birthday"
-                        name="birthday"
-                        type="date"
-                        className="normal-case"
-                        value={formik.values.birthday}
-                        onChange={formik.handleChange}
-                        error={formik.errors.birthday}
-                    />
+                    {!isGuest && (
+                        <Input
+                            disabled={isGuest}
+                            containerClassName="col-span-4 flex flex-col gap-[4px]"
+                            label="Date Joined in Sport"
+                            id="dateJoined"
+                            name="dateJoined"
+                            type="date"
+                            className="normal-case"
+                            value={formik.values.dateJoined}
+                            onChange={formik.handleChange}
+                            error={formik.errors.dateJoined}
+                        />
+                    )}
                     {!isGuest && (
                         <span className="flex items-center gap-[10px]">
                             <input

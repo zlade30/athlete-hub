@@ -138,4 +138,5 @@ declare global {
 
     type BarangayProps = SelectPropsData;
     type SportsProps = SelectPropsData;
+    type GenderProps = SelectPropsData;
 }

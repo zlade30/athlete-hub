@@ -49,3 +49,25 @@ export const debounce = (func: Function, delay: number) => {
         }, delay);
     };
 };
+
+export const calculateAge = (birthdate: string) => {
+    // Parse the birthdate string to a Date object
+    const birthDate = new Date(birthdate);
+
+    // Get the current date
+    const currentDate = new Date();
+
+    // Calculate the difference in years
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+
+    // Check if the birthday has occurred this year
+    if (
+        currentDate.getMonth() < birthDate.getMonth() ||
+        (currentDate.getMonth() === birthDate.getMonth() && currentDate.getDate() < birthDate.getDate())
+    ) {
+        // If not, subtract 1 from the age
+        age--;
+    }
+
+    return age;
+}
