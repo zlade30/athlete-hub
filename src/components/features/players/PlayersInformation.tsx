@@ -44,7 +44,7 @@ const PlayersInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>)
         sport: yup.string().required('* required field'),
         barangay: yup.string().required('* required field'),
         height: yup.string().notRequired(),
-        age: yup.string().required('* required field'),
+        age: yup.string().notRequired(),
         weight: yup.string().notRequired(),
         videos: yup.array().notRequired(),
         dateJoined: yup.string().notRequired(),
