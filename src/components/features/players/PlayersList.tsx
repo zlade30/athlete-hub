@@ -40,6 +40,7 @@ const PlayersList = () => {
     const [selectedSport, setSelectedSport] = useState('All');
     const [selectedGender, setSelectedGender] = useState('All');
     const [showAchievements, setShowAchievements] = useState(false);
+    const [showActive, setShowActive] = useState(true);
     const [isGuest, setIsGuest] = useState(false);
 
     const handleKeyFilters = (list: PlayerProps[], key: 'barangay' | 'sport' | 'gender', selectedKey: string) => {
@@ -145,6 +146,19 @@ const PlayersList = () => {
         }
     };
 
+    const handleShowActive = async () => {
+        try {
+            dispatch(setShowSpinnerFallback({ show: true, content: 'Fetching players...' }));
+            const result = await fbGetPlayers();
+            const list = result.filter((item) => item.active === showActive);
+            dispatch(setPlayers(list!));
+            dispatch(setShowSpinnerFallback({ show: false, content: '' }));
+        } catch (error) {
+            console.log(error);
+            dispatch(setShowSpinnerFallback({ show: false, content: '' }));
+        }
+    };
+
     useEffect(() => {
         loadPlayers();
     }, [selectedBarangay, selectedSport, selectedGender]);
@@ -152,6 +166,10 @@ const PlayersList = () => {
     useEffect(() => {
         handleShowAchievements();
     }, [showAchievements]);
+
+    useEffect(() => {
+        handleShowActive();
+    }, [showActive]);
 
     useEffect(() => {
         const list = handleFilters(players);
@@ -191,7 +209,11 @@ const PlayersList = () => {
                             checked={showAchievements}
                             onChange={() => setShowAchievements(!showAchievements)}
                         />
-                        <label className="text-[14px]">With Achievements</label>
+                        <label className="text-[14px]">Achievements</label>
+                    </span>
+                    <span className="flex items-center gap-[10px] whitespace-nowrap mt-6">
+                        <input type="checkbox" checked={showActive} onChange={() => setShowActive(!showActive)} />
+                        <label className="text-[14px]">Active</label>
                     </span>
                     <Select
                         containerClassName="w-[200px] flex flex-col gap-[4px]"
