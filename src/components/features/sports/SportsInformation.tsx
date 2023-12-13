@@ -18,6 +18,7 @@ import {
 } from '@/redux/reducers/sports';
 import { Modal } from '@/components/shared';
 import { CancelIcon } from '@/public/icons';
+import { fbGetPlayerFromSports, fbGetPlayers, fbUpdatePlayer } from '@/firebase-api/player';
 
 const SportsInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>) => {
     const dispatch = useDispatch();
@@ -82,6 +83,10 @@ const SportsInformation = ({ open, handleClose }: Omit<ModalProps, 'children'>) 
             dispatch(setShowSpinnerDialog({ open: true, content: 'Removing sport...' }));
             dispatch(setShowSportInformation(false));
             await fbDeleteSport(selectedSport?.id!);
+            const results = await fbGetPlayerFromSports(selectedSport?.name!);
+            results.forEach(async (player) => {
+                await fbUpdatePlayer({ ...player, removed: true });
+            });
             dispatch(removeSport(selectedSport?.id!));
             dispatch(setShowSpinnerDialog({ open: false, content: '' }));
             dispatch(setCurrentInfo('barangay-info'));

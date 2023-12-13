@@ -1,5 +1,5 @@
 import { db } from "@/firebase"
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore"
 
 export const fbAddPlayer = async (payload: PlayerProps) => {
     try {
@@ -86,6 +86,17 @@ export const fbGetPlayerFiles = async (playerId: string) => {
     try {
         const result = await getDocs(collection(db, 'players', playerId, 'files'));
         const resultDocs = result.docs.map((item) => ({ id: item.id, ...item.data() as FileProps }));
+        const players = resultDocs.sort((a, b) => b.dateAdded! - a.dateAdded!);
+        return players;
+    } catch (error) {
+        throw new Error(`An error occurred while fetching the list of files: ${error}`);
+    }
+}
+
+export const fbGetPlayerFromSports = async (sport: string) => {
+    try {
+        const result = await getDocs(query(collection(db, 'players'), where('sport', '==', sport)));
+        const resultDocs = result.docs.map((item) => ({ id: item.id, ...item.data() as PlayerProps }));
         const players = resultDocs.sort((a, b) => b.dateAdded! - a.dateAdded!);
         return players;
     } catch (error) {

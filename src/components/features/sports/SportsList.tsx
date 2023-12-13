@@ -16,6 +16,7 @@ import ReactToPrint from 'react-to-print';
 import { SportsInformation, SportsReport } from '.';
 import { fbDeleteSport, fbGetSports } from '@/firebase-api/sports';
 import { removeSport, setSelectedSport, setShowSportInformation, setSports } from '@/redux/reducers/sports';
+import { fbGetPlayerFromSports, fbUpdatePlayer } from '@/firebase-api/player';
 const SportsList = () => {
     const sportsReportRef = useRef();
     const dispatch = useDispatch();
@@ -67,6 +68,10 @@ const SportsList = () => {
         try {
             dispatch(setShowSpinnerDialog({ open: true, content: 'Removing sport...' }));
             await fbDeleteSport(sport?.id!);
+            const results = await fbGetPlayerFromSports(sport?.name!);
+            results.forEach(async (player) => {
+                await fbUpdatePlayer({ ...player, removed: true });
+            });
             dispatch(removeSport(sport?.id!));
             dispatch(setShowSpinnerDialog({ open: false, content: '' }));
             dispatch(setCurrentInfo('barangay-info'));

@@ -44,9 +44,9 @@ const PlayersList = () => {
 
     const handleKeyFilters = (list: PlayerProps[], key: 'barangay' | 'sport' | 'gender', selectedKey: string) => {
         if (selectedKey === 'All') {
-            return list.filter((item: PlayerProps) => item[key] !== 'All');
+            return list.filter((item: PlayerProps) => item[key] !== 'All' && !item.removed);
         } else {
-            return list.filter((item: PlayerProps) => item[key] === selectedKey);
+            return list.filter((item: PlayerProps) => item[key] === selectedKey && !item.removed);
         }
     };
 

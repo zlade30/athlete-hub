@@ -98,6 +98,7 @@ declare global {
         active?: boolean;
         birthday: string;
         files?: number | any;
+        removed?: boolean;
     }
 
     type TeamPlayerProps = {
