@@ -19,7 +19,7 @@ const Page = () => {
     useEffect(() => {
         const id = localStorage.getItem('id');
         if (!id) redirect('sign-in');
-        if (path === '/') redirect('/players');
+        if (path === '/') redirect('/highlights');
     }, []);
 
     if (isHighlightPage) return <HighlightsList />;

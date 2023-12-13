@@ -17,36 +17,36 @@ const HighlightsList = () => {
                 handleClose={() => dispatch(setShowHighlightInformation(false))}
             />
             <div className="w-full p-[20px] flex items-center justify-between gap-[20px]">
-                <div className="w-full flex items-center gap-[20px]">
+                <div className="w-full grid grid-cols-3 items-center gap-[20px]">
                     <div
-                        className="w-[200px] h-[200px] rounded-[14px] relative"
+                        className="w-full h-[450px] rounded-[14px] relative"
                         onClick={() => dispatch(setShowHighlightInformation(true))}
                     >
-                        <Image src={highlight1} fill alt="img" />
+                        <Image src={highlight1} fill alt="img" objectFit="contain" />
                     </div>
                     <div
-                        className="w-[200px] h-[200px] rounded-[14px] relative"
+                        className="w-full h-[450px] rounded-[14px] relative"
                         onClick={() => dispatch(setShowHighlightInformation(true))}
                     >
-                        <Image src={highlight2} fill alt="img" />
+                        <Image src={highlight2} fill alt="img" objectFit="contain" />
                     </div>
                     <div
-                        className="w-[200px] h-[200px] rounded-[14px] relative"
+                        className="w-full h-[450px] rounded-[14px] relative"
                         onClick={() => dispatch(setShowHighlightInformation(true))}
                     >
-                        <Image src={highlight3} fill alt="img" />
+                        <Image src={highlight3} fill alt="img" objectFit="contain" />
                     </div>
                     <div
-                        className="w-[200px] h-[200px] rounded-[14px] relative"
+                        className="w-full h-[450px] rounded-[14px] relative"
                         onClick={() => dispatch(setShowHighlightInformation(true))}
                     >
-                        <Image src={highlight4} fill alt="img" />
+                        <Image src={highlight4} fill alt="img" objectFit="contain" />
                     </div>
                     <div
-                        className="w-[200px] h-[200px] rounded-[14px] relative"
+                        className="w-full h-[450px] rounded-[14px] relative"
                         onClick={() => dispatch(setShowHighlightInformation(true))}
                     >
-                        <Image src={highlight5} fill alt="img" />
+                        <Image src={highlight5} fill alt="img" objectFit="contain" />
                     </div>
                 </div>
             </div>
