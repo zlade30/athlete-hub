@@ -1,18 +1,27 @@
 import { CancelIcon } from '@/public/icons';
 import { defaultProfileImg } from '@/public/images';
+import { setSelectedAthletes } from '@/redux/reducers/highlights';
 import { setSelectedPlayers } from '@/redux/reducers/teams';
 import { useAppSelector } from '@/redux/store';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
 const TeamPlayerBox = ({ isGuest, player }: { isGuest: boolean; player: TeamPlayerProps }) => {
     const dispatch = useDispatch();
     const { selectedPlayers } = useAppSelector((state) => state.teams);
+    const { selectedAthletes } = useAppSelector((state) => state.highlights);
+    const path = usePathname();
 
     const handleRemovePlayer = () => {
-        const removePlayer = selectedPlayers.filter((item) => item.id !== player.id);
-        dispatch(setSelectedPlayers(removePlayer));
+        if (path.includes('highlights')) {
+            const removePlayer = selectedAthletes.filter((item) => item.id !== player.id);
+            dispatch(setSelectedAthletes(removePlayer));
+        } else {
+            const removePlayer = selectedPlayers.filter((item) => item.id !== player.id);
+            dispatch(setSelectedPlayers(removePlayer));
+        }
     };
 
     return (

@@ -52,10 +52,29 @@ declare global {
         dateUpdated?: number;
     }
 
+    type PlayerHighlightProps = {
+        id?: string;
+        profile: string;
+        lastName: string;
+        firstName: string;
+        selected?: boolean;
+    }
+
+    type TeamHighlightProps = {
+        id?: string;
+        name: string;
+        players: PlayerProps[];
+        profile: string;
+        selected?: boolean;
+    }
+
     type HighlightProps = {
         id?: string;
         name: string;
         image: string;
+        date: string;
+        teams: TeamHighlightProps[];
+        athletes: PlayerHighlightProps[];
         dateAdded?: number;
         dateUpdated?: number;
     }

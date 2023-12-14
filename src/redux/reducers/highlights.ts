@@ -4,12 +4,21 @@ type InitialStateProps = {
     highlights: HighlightProps[];
     selectedHighlight: HighlightProps | undefined;
     showHighlightInformation: boolean;
+    showTeamSelection: boolean;
+    showAthleteSelection: boolean;
+    selectedTeams: TeamHighlightProps[];
+    selectedAthletes: PlayerHighlightProps[];
 };
 
 const initialState: InitialStateProps = {
     highlights: [],
     selectedHighlight: undefined,
-    showHighlightInformation: false
+    showHighlightInformation: false,
+    showTeamSelection: false,
+    showAthleteSelection: false,
+    selectedTeams: [],
+    selectedAthletes: []
+
 };
 
 export const slice = createSlice({
@@ -34,6 +43,18 @@ export const slice = createSlice({
         setShowHighlightInformation: (state, action: PayloadAction<boolean>) => {
             state.showHighlightInformation = action.payload
         },
+        setShowTeamSelection: (state, action: PayloadAction<boolean>) => {
+            state.showTeamSelection = action.payload
+        },
+        setShowAthleteSelection: (state, action: PayloadAction<boolean>) => {
+            state.showAthleteSelection = action.payload
+        },
+        setSelectedTeams: (state, action: PayloadAction<TeamHighlightProps[]>) => {
+            state.selectedTeams = action.payload
+        },
+        setSelectedAthletes: (state, action: PayloadAction<PlayerHighlightProps[]>) => {
+            state.selectedAthletes = action.payload
+        }
     }
 });
 
@@ -43,7 +64,11 @@ export const {
     setHighlights,
     setSelectedHighlights,
     setShowHighlightInformation,
-    updateHighlights
+    updateHighlights,
+    setShowTeamSelection,
+    setSelectedTeams,
+    setSelectedAthletes,
+    setShowAthleteSelection
 } = slice.actions;
 
 export default slice.reducer;
