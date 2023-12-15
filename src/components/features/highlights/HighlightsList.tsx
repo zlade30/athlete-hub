@@ -11,7 +11,7 @@ import {
     setShowHighlightInformation,
     setShowTeamSelection
 } from '@/redux/reducers/highlights';
-import { DeleteIcon, EditIcon, PlusIcon, TrophyIcon, UserIcon } from '@/public/icons';
+import { DeleteIcon, EditIcon, PlusIcon, ShowIcon, TrophyIcon, UserIcon } from '@/public/icons';
 import HighlightsTeamSelection from './HighlightsTeamSelection';
 import { HighlightsAthleteSelection } from '.';
 import { SpinnerDialog } from '@/components/shared/dialogs';
@@ -107,16 +107,24 @@ const HighlightsList = () => {
                         <div className="w-full flex flex-col p-[20px]">
                             <div className="w-full flex items-center justify-between">
                                 <p className="text-[40px] font-bold">{item.name}</p>
-                                <div className="flex items-center gap-[20px]">
-                                    <EditIcon
+                                {isGuest && (
+                                    <ShowIcon
                                         onClick={() => handleSelectedHighlight(item)}
-                                        className="w-[20px] h-[20px] cursor-pointer"
+                                        className="w-[30px] h-[30px] cursor-pointer"
                                     />
-                                    <DeleteIcon
-                                        onClick={() => handleDelete(item)}
-                                        className="w-[20px] h-[20px] cursor-pointer"
-                                    />
-                                </div>
+                                )}
+                                {!isGuest && (
+                                    <div className="flex items-center gap-[20px]">
+                                        <EditIcon
+                                            onClick={() => handleSelectedHighlight(item)}
+                                            className="w-[20px] h-[20px] cursor-pointer"
+                                        />
+                                        <DeleteIcon
+                                            onClick={() => handleDelete(item)}
+                                            className="w-[20px] h-[20px] cursor-pointer"
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <p className="text-[30px] font-medium">{formatDate(new Date(item.date))}</p>
                             <div className="w-full grid grid-cols-2 text-[20px] font-normal py-[20px]">

@@ -66,7 +66,7 @@ const SignInPage = () => {
     const loginAsGuest = () => {
         localStorage.setItem('id', 'guest');
         localStorage.setItem('user', JSON.stringify({ email: 'Guest' }));
-        router.push('/players');
+        router.push('/highlights');
     };
 
     useEffect(() => {
