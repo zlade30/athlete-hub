@@ -1,4 +1,5 @@
 import { lguImg, logoImg } from '@/public/images';
+import { useAppSelector } from '@/redux/store';
 import { printDate } from '@/utils/helpers';
 import Image from 'next/image';
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
@@ -6,10 +7,12 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 const PlayersReport = forwardRef(
     (
         {
+            isGuest,
             playerList,
             selectedSport,
             selectedBarangay
         }: {
+            isGuest: boolean;
             playerList: PlayerProps[];
             selectedSport: string;
             selectedBarangay: string;
@@ -17,6 +20,18 @@ const PlayersReport = forwardRef(
         ref
     ) => {
         const playersReportRef = useRef<HTMLDivElement>(null);
+        const { players } = useAppSelector((state) => state.player);
+
+        const handleList = () => {
+            const hasSelected = players.some((player) => player.selected);
+            if (isGuest && hasSelected) {
+                return players.filter((player) => player.selected);
+            } else {
+                return playerList;
+            }
+        };
+
+        const list = handleList();
 
         if (ref) {
             if (typeof ref === 'function') {
@@ -61,7 +76,7 @@ const PlayersReport = forwardRef(
                             </tr>
                         </thead>
                         <tbody>
-                            {playerList.map((item, key) => (
+                            {list.map((item, key) => (
                                 <tr key={item.id} className="h-[30px]">
                                     <td>{key + 1}</td>
                                     <td>{`${item.firstName} ${item.lastName}`}</td>

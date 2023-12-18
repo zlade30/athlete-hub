@@ -15,6 +15,7 @@ import {
 } from '@/redux/reducers/players';
 import { usePathname } from 'next/navigation';
 import { setCoaches, setSelectedCoach, setShowCoachInformation } from '@/redux/reducers/coaches';
+import { twMerge } from 'tailwind-merge';
 
 const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
     const path = usePathname();
@@ -67,12 +68,28 @@ const PersonBox = ({ person }: { person: PlayerProps | CoachProps }) => {
         dispatch(setSelectedPlayer(person as PlayerProps));
     };
 
+    const handleSelect = (person: PlayerProps | CoachProps) => {
+        if (isGuest) {
+            const update = players.map((player) =>
+                player.id === person.id ? { ...player, selected: !player.selected } : player
+            );
+            dispatch(setPlayers(update));
+        }
+    };
+
     useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
     }, []);
 
     return (
-        <div className="bg-white group w-[200px] h-[200px] rounded-[8px] flex flex-col items-center p-[20px] relative">
+        <div
+            className={twMerge(
+                'bg-white group w-[200px] h-[200px] rounded-[8px] flex flex-col items-center p-[20px] relative',
+                person?.selected && 'bg-[#d5d6db]',
+                isGuest && 'cursor-pointer'
+            )}
+            onClick={() => handleSelect(person)}
+        >
             {path.includes('players') && person.achievements > 0 && (
                 <div className="absolute left-0 top-0 mt-[8px] ml-[12px] flex items-center gap-[4px]">
                     <p className="text-[14px]">{person.achievements}</p>

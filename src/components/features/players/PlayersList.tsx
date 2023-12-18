@@ -24,6 +24,7 @@ import { PlayersAchievements, PlayersInformation, PlayersReport } from '.';
 import { setBarangayList, setSelectedBarangay } from '@/redux/reducers/barangay';
 import PlayersFiles from './PlayersFiles';
 import { generateId } from '@/utils/helpers';
+import { Button } from '@/components/shared/buttons';
 
 const PlayersList = () => {
     const playersReportRef = useRef();
@@ -159,6 +160,10 @@ const PlayersList = () => {
         }
     };
 
+    const handleClearSelection = () => {
+        dispatch(setPlayers(players.map((player) => ({ ...player, selected: false }))));
+    };
+
     useEffect(() => {
         loadPlayers();
     }, [selectedBarangay, selectedSport, selectedGender]);
@@ -191,6 +196,7 @@ const PlayersList = () => {
             />
             <PlayersReport
                 ref={playersReportRef}
+                isGuest={isGuest}
                 playerList={playerList}
                 selectedSport={selectedSport}
                 selectedBarangay={selectedBarangay}
@@ -244,6 +250,9 @@ const PlayersList = () => {
                         value={searchPlayer}
                         onChange={handleSearch}
                     />
+                    {isGuest && players.some((player) => player.selected) && (
+                        <Button onClick={handleClearSelection} value="Clear" className="mt-[20px]" />
+                    )}
                 </div>
                 <div className="w-full flex items-center justify-end gap-[20px]">
                     {!isGuest && <ExportIcon onClick={handleExport} className="w-[30px] h-[30px] cursor-pointer" />}
