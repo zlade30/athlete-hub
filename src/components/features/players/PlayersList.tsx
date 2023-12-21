@@ -38,6 +38,7 @@ const PlayersList = () => {
     const [sportList, setSportList] = useState<SportsProps[]>([]);
     const [genderList, setGenderList] = useState<GenderProps[]>([]);
     const [searchPlayer, setSearchPlayer] = useState('');
+    const [age, setAge] = useState('');
     const [selectedSport, setSelectedSport] = useState('All');
     const [selectedGender, setSelectedGender] = useState('All');
     const [showAchievements, setShowAchievements] = useState(false);
@@ -134,6 +135,11 @@ const PlayersList = () => {
         setSelectedGender(option.value);
     };
 
+    const handleAge = (evt: ChangeEvent<HTMLInputElement>) => {
+        const value = evt.target.value;
+        setAge(value);
+    };
+
     const handleShowAchievements = async () => {
         try {
             dispatch(setShowSpinnerFallback({ show: true, content: 'Fetching players...' }));
@@ -177,9 +183,15 @@ const PlayersList = () => {
     }, [showActive]);
 
     useEffect(() => {
-        const list = handleFilters(players);
-        setPlayerList(list!);
-    }, [players]);
+        if (age) {
+            const result = players.filter((player) => player.age === age);
+            const list = handleFilters(result);
+            setPlayerList(list);
+        } else {
+            const list = handleFilters(players);
+            setPlayerList(list!);
+        }
+    }, [players, age]);
 
     useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
@@ -221,6 +233,13 @@ const PlayersList = () => {
                         <input type="checkbox" checked={showActive} onChange={() => setShowActive(!showActive)} />
                         <label className="text-[14px]">Active</label>
                     </span>
+                    <Input
+                        containerClassName="w-[100px] flex flex-col gap-[4px]"
+                        label="Age"
+                        type="number"
+                        value={age}
+                        onChange={handleAge}
+                    />
                     <Select
                         containerClassName="w-[200px] flex flex-col gap-[4px]"
                         label="Sports"
