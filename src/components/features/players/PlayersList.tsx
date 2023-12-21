@@ -45,21 +45,6 @@ const PlayersList = () => {
     const [showActive, setShowActive] = useState(true);
     const [isGuest, setIsGuest] = useState(false);
 
-    const handleKeyFilters = (list: PlayerProps[], key: 'barangay' | 'sport' | 'gender', selectedKey: string) => {
-        if (selectedKey === 'All') {
-            return list.filter((item: PlayerProps) => item[key] !== 'All' && !item.removed);
-        } else {
-            return list.filter((item: PlayerProps) => item[key] === selectedKey && !item.removed);
-        }
-    };
-
-    const handleFilters = (list: PlayerProps[]) => {
-        const genderFilter = handleKeyFilters(list, 'gender', selectedGender);
-        const barangayFilter = handleKeyFilters(genderFilter, 'barangay', selectedBarangay);
-        const filter = handleKeyFilters(barangayFilter, 'sport', selectedSport);
-        return filter;
-    };
-
     const handleExport = () => {
         const refactorList = playerList.map((item) => ({
             'LAST NAME': item.lastName,
@@ -81,8 +66,8 @@ const PlayersList = () => {
         try {
             dispatch(setShowSpinnerFallback({ show: true, content: 'Fetching players...' }));
             const result = await fbGetPlayers();
-            const list = handleFilters(result);
-            dispatch(setPlayers(list!));
+            setPlayerList(result);
+            dispatch(setPlayers(result));
             dispatch(setShowSpinnerFallback({ show: false, content: '' }));
         } catch (error) {
             console.log(error);
@@ -114,12 +99,7 @@ const PlayersList = () => {
 
     const handleSearch = (evt: ChangeEvent<HTMLInputElement>) => {
         const value = evt.target.value;
-        const result = players.filter((item) =>
-            `${item.firstName} ${item.lastName}`.toLocaleLowerCase().includes(value.toLocaleLowerCase())
-        );
-        const list = handleFilters(result);
-        setPlayerList(list);
-        setSearchPlayer(evt.target.value);
+        setSearchPlayer(value);
     };
 
     const handleSelectedSport = (item: SportsProps) => {
@@ -170,6 +150,22 @@ const PlayersList = () => {
         dispatch(setPlayers(players.map((player) => ({ ...player, selected: false }))));
     };
 
+    const handleFilters = () => {
+        console.log(showAchievements);
+        const filter = players.filter(
+            (player) =>
+                !player.removed &&
+                Boolean(player.achievements) === showAchievements &&
+                player.active === showActive &&
+                (age === '' || player.age === age) &&
+                (selectedSport === 'All' || player.sport === selectedSport) &&
+                (selectedBarangay === 'All' || player.barangay === selectedBarangay) &&
+                (selectedGender === 'All' || player.gender === selectedGender) &&
+                `${player.firstName} ${player.lastName}`.toLocaleLowerCase().includes(searchPlayer.toLocaleLowerCase())
+        );
+        setPlayerList(filter);
+    };
+
     useEffect(() => {
         loadPlayers();
     }, [selectedBarangay, selectedSport, selectedGender]);
@@ -183,22 +179,15 @@ const PlayersList = () => {
     }, [showActive]);
 
     useEffect(() => {
-        if (age) {
-            const result = players.filter((player) => player.age === age);
-            const list = handleFilters(result);
-            setPlayerList(list);
-        } else {
-            const list = handleFilters(players);
-            setPlayerList(list!);
-        }
-    }, [players, age]);
-
-    useEffect(() => {
         setIsGuest(localStorage.getItem('id') === 'guest');
         loadSports();
         loadBarangay();
         loadGenders();
     }, []);
+
+    useEffect(() => {
+        if (players.length) handleFilters();
+    }, [age, searchPlayer, selectedBarangay, selectedSport, showActive, showAchievements, players]);
 
     return (
         <div className="w-full h-full flex flex-col relative pb-[20px]">
